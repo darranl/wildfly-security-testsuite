@@ -1,3 +1,7 @@
 .vscode
 target/
 
+.project
+.settings
+
+
