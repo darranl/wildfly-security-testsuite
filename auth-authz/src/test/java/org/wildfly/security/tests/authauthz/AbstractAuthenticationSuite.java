@@ -15,7 +15,9 @@ import org.junit.platform.suite.api.Suite;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(AuthPermutationsSuiteRunner.class)
+@SelectClasses(value = {AuthPermutationsSuiteRunner.class,
+        ParamAuthPermutationsSuiteRunner.class,
+        DynamicAuthPermutationsSuiteRunner.class})
 public abstract class AbstractAuthenticationSuite {
 
     private static String mode = "";
