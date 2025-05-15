@@ -42,7 +42,16 @@
         <artifactId>wildfly-elytron-auth-server</artifactId>
         <version>${version.org.wildfly.elytron}</version>
       </dependency>
-
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-credential</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-realm</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
 
