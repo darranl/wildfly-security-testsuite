@@ -13,6 +13,7 @@ import java.security.Security;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -61,6 +62,7 @@ public abstract class AbstractAuthenticationSuite {
     private static Endpoint endpoint;
     private static Closeable streamServer;
     private static String providerName;
+    private static TestContext testContext;
 
     private static String mode = "";
 
@@ -76,6 +78,10 @@ public abstract class AbstractAuthenticationSuite {
 
     static String getMode() {
         return mode;
+    }
+
+    static TestContext getTestContext() {
+        return testContext;
     }
 
     static void registerProvider() {
@@ -121,6 +127,11 @@ public abstract class AbstractAuthenticationSuite {
         final SSLContext serverContext = SSLContext.getDefault();
         streamServer = networkServerProvider.createServer(new InetSocketAddress("localhost", 30123),
                 optionMap, saslAuthenticationFactory, serverContext);
+
+        Map<TestContext.Transport, Set<String>> transportMechMap =
+                Collections.singletonMap(TestContext.Transport.SASL,
+                        Collections.singleton("PLAIN"));
+        testContext = new TestContext(transportMechMap);
     }
 
     static Stream<IdentityDefinition> obtainTestIdentities() {
