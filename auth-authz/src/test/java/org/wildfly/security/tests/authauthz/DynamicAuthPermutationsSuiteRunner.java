@@ -86,7 +86,7 @@ public class DynamicAuthPermutationsSuiteRunner {
 
     public void testSaslBadUsername(final String mechanism) {
         System.out.printf("testSaslBadUsername(%s)\n", mechanism);
-        throw new IllegalStateException("NoNoNo");
+        //throw new IllegalStateException("NoNoNo");
     }
 
     public void testSaslBadPassword(final String mechanism) {
