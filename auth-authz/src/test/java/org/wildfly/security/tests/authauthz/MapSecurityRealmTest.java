@@ -13,7 +13,6 @@ import java.util.stream.Collectors;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.SimpleMapBackedSecurityRealm;
 import org.wildfly.security.auth.realm.SimpleRealmEntry;
-import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.authz.Attributes;
 import org.wildfly.security.credential.Credential;
@@ -35,6 +34,7 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
     @BeforeSuite
     public static void setup() throws Exception {
         // Step 0 - Pre-Initialisation
+        registerProvider();
         passwordFactory = PasswordFactory.getInstance(ClearPassword.ALGORITHM_CLEAR, TEST_PROVIDERS);
 
         setMode("MAP");
@@ -42,7 +42,7 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
         // (Not needed for Map as in-memory)
 
         // Step 2 - Initialise the SecurityDomain
-        SecurityDomain securityDomain = createSecurityDomain(MapSecurityRealmTest::createSecurityRealm);
+        createTestServer(MapSecurityRealmTest::createSecurityRealm);
 
         // Step 3 - Initialise the HTTP process(es)
         // Can we do path based?

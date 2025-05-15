@@ -5,20 +5,36 @@
 
 package org.wildfly.security.tests.authauthz;
 
+import java.io.Closeable;
+import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+import javax.net.ssl.SSLContext;
+import javax.security.sasl.SaslServerFactory;
+
+import org.jboss.remoting3.Endpoint;
+import org.jboss.remoting3.spi.NetworkServerProvider;
 import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
+import org.wildfly.security.WildFlyElytronProvider;
 import org.wildfly.security.auth.permission.LoginPermission;
+import org.wildfly.security.auth.server.MechanismConfiguration;
+import org.wildfly.security.auth.server.SaslAuthenticationFactory;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
+import org.wildfly.security.sasl.util.ServiceLoaderSaslServerFactory;
+import org.xnio.OptionMap;
+import org.xnio.Options;
 
 /**
  * Base definition of the {@code Suite} of tests that will be used to run the authentication tests
@@ -32,10 +48,19 @@ import org.wildfly.security.permission.PermissionVerifier;
         DynamicAuthPermutationsSuiteRunner.class})
 public abstract class AbstractAuthenticationSuite {
 
-    // TODO - This will become the providers needed for testing.
-    static final Supplier<Provider[]> TEST_PROVIDERS = Security::getProviders;
+    /*
+     * General Constants
+     */
 
     private static final String REALM_NAME = "TestRealm";
+    private static final OptionMap optionMap = OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE);
+
+    // Test State
+    // TODO - This will become the providers needed for testing.
+    static Supplier<Provider[]> TEST_PROVIDERS = Security::getProviders;
+    private static Endpoint endpoint;
+    private static Closeable streamServer;
+    private static String providerName;
 
     private static String mode = "";
 
@@ -53,6 +78,12 @@ public abstract class AbstractAuthenticationSuite {
         return mode;
     }
 
+    static void registerProvider() {
+        final WildFlyElytronProvider provider = new WildFlyElytronProvider();
+        Security.addProvider(provider);
+        providerName = provider.getName();
+    }
+
     static SecurityDomain createSecurityDomain(final Supplier<SecurityRealm> securityRealmSupplier) {
         final SecurityDomain.Builder domainBuilder = SecurityDomain.builder();
         domainBuilder.addRealm(REALM_NAME, securityRealmSupplier.get()).build();
@@ -63,6 +94,33 @@ public abstract class AbstractAuthenticationSuite {
                 (p, r) -> PermissionVerifier.from(new LoginPermission()));
 
         return domainBuilder.build();
+    }
+
+    /**
+     * Create the test server process backed bu the {@code SecurityRealm} available from the
+     * {@code securityRealmSupplier}
+     *
+     * @param securityRealmSupplier The supplier of the {@code SecurityRealm}.
+     */
+    static void createTestServer(final Supplier<SecurityRealm> securityRealmSupplier) throws Exception {
+        final Set<String> supportedMechanisms = Collections.singleton("PLAIN"); // TODO Maybe based on input or all MECHs.
+        endpoint = Endpoint.builder()
+                .setEndpointName(
+                        String.format("%sEndpoint", AbstractAuthenticationSuite.class.getName()))
+                .build();
+        NetworkServerProvider networkServerProvider = endpoint.getConnectionProviderInterface("remote", NetworkServerProvider.class);
+
+        SaslServerFactory saslServerFactory = new ServiceLoaderSaslServerFactory(AbstractAuthenticationSuite.class.getClassLoader());
+
+        SaslAuthenticationFactory saslAuthenticationFactory =  SaslAuthenticationFactory.builder()
+                .setSecurityDomain(createSecurityDomain(securityRealmSupplier))
+                .setFactory(saslServerFactory)
+                .setMechanismConfigurationSelector(mechanismInformation -> supportedMechanisms.contains(mechanismInformation.getMechanismName()) ? MechanismConfiguration.EMPTY : null)
+                .build();
+
+        final SSLContext serverContext = SSLContext.getDefault();
+        streamServer = networkServerProvider.createServer(new InetSocketAddress("localhost", 30123),
+                optionMap, saslAuthenticationFactory, serverContext);
     }
 
     static Stream<IdentityDefinition> obtainTestIdentities() {
