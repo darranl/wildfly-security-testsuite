@@ -5,17 +5,32 @@
 
 package org.wildfly.security.tests.authauthz;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getEndpoint;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getMode;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getTestContext;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
+import org.jboss.remoting3.Connection;
+import org.jboss.remoting3.Endpoint;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
+import org.wildfly.security.auth.client.AuthenticationConfiguration;
+import org.wildfly.security.auth.client.AuthenticationContext;
+import org.wildfly.security.auth.client.MatchRule;
+import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.authauthz.TestContext.Transport;
+import org.xnio.IoFuture;
 
 /**
  * A runner for a realm specific suite that dynamically defines the tests to run.
@@ -80,18 +95,47 @@ public class DynamicAuthPermutationsSuiteRunner {
                                     AbstractAuthenticationSuite.getMode(), t.name())));
     }
 
-    public void testSaslSuccess(final String mechanism) {
+    public void testSaslSuccess(final String mechanism) throws IOException {
         System.out.printf("testSaslSuccess(%s)\n", mechanism);
+        AuthenticationContext authContext = AuthenticationContext.empty()
+                .with(MatchRule.ALL, AuthenticationConfiguration.empty()
+                        .useName("user1")
+                        .usePassword("password1")
+                        .setSaslMechanismSelector(SaslMechanismSelector.fromString(mechanism))
+                );
+
+        Endpoint endpoint = getEndpoint();
+
+        IoFuture<Connection> futureConnection = authContext.run((PrivilegedAction<IoFuture<Connection>>) () -> {
+            try {
+                return endpoint.connect(new URI("remote://localhost:30123"),
+                    AbstractAuthenticationSuite.optionMap);
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        IoFuture.Status status = futureConnection.await(500, TimeUnit.MILLISECONDS);
+        if (status == IoFuture.Status.FAILED) {
+            futureConnection.getException().printStackTrace();
+        }
+
+        assertEquals(IoFuture.Status.DONE, status, "Expected IoFuture to be DONE"); // Some situations cause indefinate hang.
+        try (Connection connection = futureConnection.get()) {
+            assertNotNull(connection, "Expected a connection to have been opened");
+        }
+
     }
 
     public void testSaslBadUsername(final String mechanism) {
         System.out.printf("testSaslBadUsername(%s)\n", mechanism);
-        //throw new IllegalStateException("NoNoNo");
     }
 
     public void testSaslBadPassword(final String mechanism) {
         System.out.printf("testSaslBadPassword(%s)\n", mechanism);
     }
+
+
 
     public void testSaslBruteForce(final String mechanism) {
         System.out.printf("testSaslBruteForce(%s)\n", mechanism);

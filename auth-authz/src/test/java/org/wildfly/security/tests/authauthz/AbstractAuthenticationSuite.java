@@ -54,7 +54,7 @@ public abstract class AbstractAuthenticationSuite {
      */
 
     private static final String REALM_NAME = "TestRealm";
-    private static final OptionMap optionMap = OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE);
+    static final OptionMap optionMap = OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE);
 
     // Test State
     // TODO - This will become the providers needed for testing.
@@ -70,6 +70,7 @@ public abstract class AbstractAuthenticationSuite {
     public static void endSuite() {
         //TODO - Can we handle all clean up on our own?
         System.out.printf("endSuite() called for mode='%s'\n", mode);
+        testContext = null;
     }
 
     static void setMode(final String mode) {
@@ -82,6 +83,10 @@ public abstract class AbstractAuthenticationSuite {
 
     static TestContext getTestContext() {
         return testContext;
+    }
+
+    static Endpoint getEndpoint() {
+        return endpoint;
     }
 
     static void registerProvider() {
