@@ -5,21 +5,24 @@
 
 package org.wildfly.security.tests.authauthz;
 
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getEndpoint;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getMode;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getTestContext;
+import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.toUri;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
+
+import javax.security.sasl.SaslException;
 
 import org.jboss.remoting3.Connection;
 import org.jboss.remoting3.Endpoint;
@@ -97,42 +100,53 @@ public class DynamicAuthPermutationsSuiteRunner {
 
     public void testSaslSuccess(final String mechanism) throws IOException {
         System.out.printf("testSaslSuccess(%s)\n", mechanism);
+
+        performSaslTest(mechanism, "user1", "password1", true);
+    }
+
+    public void testSaslBadUsername(final String mechanism) throws IOException {
+        System.out.printf("testSaslBadUsername(%s)\n", mechanism);
+
+        performSaslTest(mechanism, "Bob", "password1", false);
+    }
+
+    public void testSaslBadPassword(final String mechanism) throws IOException {
+        System.out.printf("testSaslBadPassword(%s)\n", mechanism);
+
+        performSaslTest(mechanism, "user1", "passwordX", false);
+    }
+
+    private void performSaslTest(final String mechanism, final String userName,
+                                 final String password, final boolean expectSuccess) throws IOException {
+
         AuthenticationContext authContext = AuthenticationContext.empty()
                 .with(MatchRule.ALL, AuthenticationConfiguration.empty()
-                        .useName("user1")
-                        .usePassword("password1")
+                        .useName(userName)
+                        .usePassword(password)
                         .setSaslMechanismSelector(SaslMechanismSelector.fromString(mechanism))
                 );
 
         Endpoint endpoint = getEndpoint();
 
-        IoFuture<Connection> futureConnection = authContext.run((PrivilegedAction<IoFuture<Connection>>) () -> {
-            try {
-                return endpoint.connect(new URI("remote://localhost:30123"),
-                    AbstractAuthenticationSuite.optionMap);
-            } catch (URISyntaxException e) {
-                throw new RuntimeException(e);
-            }
-        });
+        IoFuture<Connection> futureConnection = authContext.run(
+                (PrivilegedAction<IoFuture<Connection>>) () ->
+                        endpoint.connect(toUri("remote://localhost:30123"),
+                                AbstractAuthenticationSuite.optionMap)
+        );
 
         IoFuture.Status status = futureConnection.await(500, TimeUnit.MILLISECONDS);
-        if (status == IoFuture.Status.FAILED) {
-            futureConnection.getException().printStackTrace();
+
+        if (expectSuccess) {
+            assertEquals(IoFuture.Status.DONE, status, "Expected IoFuture to be DONE");
+            try (Connection connection = futureConnection.get()) {
+                assertNotNull(connection, "Expected a connection to have been opened");
+            }
+        } else {
+            assertEquals(IoFuture.Status.FAILED, status, "Expected IoFuture to be FAILED");
+            Exception e = futureConnection.getException();
+            assertEquals(SaslException.class, e.getClass(), "Expected SaslException");
+            assertTrue(e.getMessage().contains("rejected authentication"), "Expected authentication to be rejected.");
         }
-
-        assertEquals(IoFuture.Status.DONE, status, "Expected IoFuture to be DONE"); // Some situations cause indefinate hang.
-        try (Connection connection = futureConnection.get()) {
-            assertNotNull(connection, "Expected a connection to have been opened");
-        }
-
-    }
-
-    public void testSaslBadUsername(final String mechanism) {
-        System.out.printf("testSaslBadUsername(%s)\n", mechanism);
-    }
-
-    public void testSaslBadPassword(final String mechanism) {
-        System.out.printf("testSaslBadPassword(%s)\n", mechanism);
     }
 
 

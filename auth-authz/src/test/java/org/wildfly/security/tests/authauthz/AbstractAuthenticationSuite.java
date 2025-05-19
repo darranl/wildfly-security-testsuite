@@ -8,6 +8,8 @@ package org.wildfly.security.tests.authauthz;
 import java.io.Closeable;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
@@ -93,6 +95,14 @@ public abstract class AbstractAuthenticationSuite {
         final WildFlyElytronProvider provider = new WildFlyElytronProvider();
         Security.addProvider(provider);
         providerName = provider.getName();
+    }
+
+    static URI toUri(final String uri) {
+        try {
+            return new URI(uri);
+        } catch (URISyntaxException e) {
+            throw new IllegalArgumentException(e);
+        }
     }
 
     static SecurityDomain createSecurityDomain(final Supplier<SecurityRealm> securityRealmSupplier) {
