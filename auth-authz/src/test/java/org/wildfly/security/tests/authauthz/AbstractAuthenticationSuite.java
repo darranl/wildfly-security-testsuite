@@ -6,7 +6,6 @@
 package org.wildfly.security.tests.authauthz;
 
 import java.io.Closeable;
-import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,9 +45,7 @@ import org.xnio.Options;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(value = {AuthPermutationsSuiteRunner.class,
-        ParamAuthPermutationsSuiteRunner.class,
-        DynamicAuthPermutationsSuiteRunner.class})
+@SelectClasses(value = {DynamicAuthPermutationsSuiteRunner.class})
 public abstract class AbstractAuthenticationSuite {
 
     /*

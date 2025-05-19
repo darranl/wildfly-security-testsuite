@@ -149,8 +149,6 @@ public class DynamicAuthPermutationsSuiteRunner {
         }
     }
 
-
-
     public void testSaslBruteForce(final String mechanism) {
         System.out.printf("testSaslBruteForce(%s)\n", mechanism);
     }
