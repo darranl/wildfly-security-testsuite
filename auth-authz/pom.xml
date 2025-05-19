@@ -123,11 +123,11 @@
       <artifactId>wildfly-elytron-http</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
+    <!--<dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-mechanism</artifactId>
       <scope>test</scope>
-    </dependency>
+    </dependency>-->
     <dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-password-impl</artifactId>
