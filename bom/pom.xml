@@ -211,6 +211,17 @@
       </dependency>
       <dependency>
         <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-digest</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-http</artifactId>
         <version>${version.org.wildfly.elytron}</version>
         <exclusions>
@@ -223,6 +234,17 @@
       <dependency>
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-mechanism</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-mechanism-digest</artifactId>
         <version>${version.org.wildfly.elytron}</version>
         <exclusions>
           <exclusion>
@@ -278,6 +300,17 @@
       <dependency>
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-sasl</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-sasl-digest</artifactId>
         <version>${version.org.wildfly.elytron}</version>
         <exclusions>
           <exclusion>

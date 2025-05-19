@@ -7,7 +7,9 @@ package org.wildfly.security.tests.authauthz;
 
 import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.junit.platform.suite.api.BeforeSuite;
@@ -31,6 +33,7 @@ import org.wildfly.security.password.spec.ClearPasswordSpec;
 public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
 
     private static PasswordFactory passwordFactory;
+
     @BeforeSuite
     public static void setup() throws Exception {
         // Step 0 - Pre-Initialisation
@@ -42,7 +45,12 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
         // (Not needed for Map as in-memory)
 
         // Step 2 - Initialise the SecurityDomain
-        createTestServer(MapSecurityRealmTest::createSecurityRealm);
+        Set<String> supportedMechanims = new HashSet<>();
+        Collections.addAll(supportedMechanims, "PLAIN", "DIGEST-MD5", "DIGEST-SHA-256",
+                "DIGEST-SHA-384", "DIGEST-SHA", "DIGEST-SHA-512-256", "DIGEST-SHA-512");
+
+        createTestServer(MapSecurityRealmTest::createSecurityRealm,
+                Collections.unmodifiableSet(supportedMechanims));
 
         // Step 3 - Initialise the HTTP process(es)
         // Can we do path based?

@@ -120,8 +120,7 @@ public abstract class AbstractAuthenticationSuite {
      *
      * @param securityRealmSupplier The supplier of the {@code SecurityRealm}.
      */
-    static void createTestServer(final Supplier<SecurityRealm> securityRealmSupplier) throws Exception {
-        final Set<String> supportedMechanisms = Collections.singleton("PLAIN"); // TODO Maybe based on input or all MECHs.
+    static void createTestServer(final Supplier<SecurityRealm> securityRealmSupplier, final Set<String> supportedMechanisms) throws Exception {
         endpoint = Endpoint.builder()
                 .setEndpointName(
                         String.format("%sEndpoint", AbstractAuthenticationSuite.class.getName()))
@@ -142,7 +141,7 @@ public abstract class AbstractAuthenticationSuite {
 
         Map<TestContext.Transport, Set<String>> transportMechMap =
                 Collections.singletonMap(TestContext.Transport.SASL,
-                        Collections.singleton("PLAIN"));
+                        supportedMechanisms);
         testContext = new TestContext(transportMechMap);
     }
 
