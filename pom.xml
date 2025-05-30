@@ -80,6 +80,7 @@
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <workingDirectory>${project.build.directory}</workingDirectory>
           <systemProperties>
             <property>
               <name>java.util.logging.manager</name>
