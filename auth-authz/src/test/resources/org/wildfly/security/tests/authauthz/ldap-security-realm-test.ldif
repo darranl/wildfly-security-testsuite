@@ -1,0 +1,17 @@
+version: 1
+
+dn: dc=security,dc=wildfly,dc=org
+objectclass: top
+objectclass: domain
+dc: security
+
+dn: uid=server,dc=security,dc=wildfly,dc=org
+objectClass: top
+objectClass: inetOrgPerson
+objectClass: person
+objectClass: organizationalPerson
+cn: server
+sn: server
+uid: server
+userPassword:: c2VydmVyUGFzc3dvcmQ=
+# Password serverPassword

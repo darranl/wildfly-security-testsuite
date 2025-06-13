@@ -6,6 +6,7 @@
 package org.wildfly.security.tests.authauthz;
 
 import java.io.Closeable;
+import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -66,10 +67,18 @@ public abstract class AbstractAuthenticationSuite {
     private static String mode = "";
 
     @AfterSuite
-    public static void endSuite() {
+    public static void endSuite() throws IOException {
         //TODO - Can we handle all clean up on our own?
         System.out.printf("endSuite() called for mode='%s'\n", mode);
         testContext = null;
+        if (streamServer != null) {
+            streamServer.close();
+            streamServer = null;
+        }
+        if (endpoint != null) {
+            endpoint.close();
+            streamServer = null;
+        }
     }
 
     static void setMode(final String mode) {
@@ -115,8 +124,8 @@ public abstract class AbstractAuthenticationSuite {
     }
 
     /**
-     * Create the test server process backed bu the {@code SecurityRealm} available from the
-     * {@code securityRealmSupplier}
+     * Create the test server process backed by the {@code SecurityRealm} available from the
+     * {@code securityRealmSupplier}.
      *
      * @param securityRealmSupplier The supplier of the {@code SecurityRealm}.
      */
