@@ -32,8 +32,36 @@
   <name>wildfly-security-testsuite-integration</name>
 
   <properties>
+    <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
+    <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
     <version.wildfly>36.0.1.Final</version.wildfly>
   </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.org.jboss.arquillian}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.bom</groupId>
+        <artifactId>wildfly-ee-with-tools</artifactId>
+        <version>${version.wildfly}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.arquillian</groupId>
+        <artifactId>wildfly-arquillian-bom</artifactId>
+        <version>${version.org.wildfly.arquillian}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <modules>
     <module>auth-authz</module>
