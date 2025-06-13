@@ -31,8 +31,51 @@
   <packaging>pom</packaging>
   <name>wildfly-security-testsuite-integration</name>
 
+  <properties>
+    <version.wildfly>36.0.1.Final</version.wildfly>
+  </properties>
+
   <modules>
     <module>auth-authz</module>
   </modules>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.wildfly.plugins</groupId>
+          <artifactId>wildfly-maven-plugin</artifactId>
+          <configuration>
+            <jboss-home>${wildfly.home}</jboss-home>
+            <provisioningDir>${wildfly.home}</provisioningDir>
+            <feature-packs>
+              <feature-pack>
+                <groupId>org.wildfly</groupId>
+                <artifactId>wildfly-galleon-pack</artifactId>
+                <version>${version.wildfly}</version>
+              </feature-pack>
+            </feature-packs>
+            <layers>
+              <layer>core-server</layer>
+              <layer>web-server</layer>
+            </layers>
+            <galleon-options>
+              <jboss-maven-dist />
+              <jboss-fork-embedded>${galleon.fork.embedded}</jboss-fork-embedded>
+            </galleon-options>
+            <log-provisioning-time>${galleon.log.time}</log-provisioning-time>
+          </configuration>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>package</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
 </project>

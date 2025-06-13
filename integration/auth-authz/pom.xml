@@ -22,12 +22,21 @@
 
   <parent>
     <groupId>org.wildfly.security.testsuite</groupId>
-    <artifactId>wildfly-security-testsuite-parent</artifactId>
+    <artifactId>wildfly-security-testsuite-integration</artifactId>
     <version>1.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
   <artifactId>wildfly-security-integration-auth-authz</artifactId>
   <name>wildfly-security-testsuite-integration-auth-authz</name>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.wildfly.plugins</groupId>
+        <artifactId>wildfly-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
