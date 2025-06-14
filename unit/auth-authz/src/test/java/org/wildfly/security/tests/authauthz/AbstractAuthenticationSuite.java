@@ -36,6 +36,7 @@ import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
 import org.wildfly.security.sasl.util.ServiceLoaderSaslServerFactory;
+import org.wildfly.security.tests.common.authauthz.TestContext;
 import org.xnio.OptionMap;
 import org.xnio.Options;
 

@@ -5,15 +5,13 @@
 
 package org.wildfly.security.tests.authauthz;
 
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.TEST_PROVIDERS;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createTestServer;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.principal.NamePrincipal;
 import org.wildfly.security.auth.realm.FileSystemSecurityRealm;

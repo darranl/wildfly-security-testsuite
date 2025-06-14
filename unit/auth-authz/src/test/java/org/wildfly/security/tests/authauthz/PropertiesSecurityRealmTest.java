@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.LegacyPropertiesSecurityRealm;
 import org.wildfly.security.auth.server.SecurityRealm;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createTestServer;
 
 /**
  * A {@code Suite} instance for testing against a {@code SecurityRealm} backed by a properties file.
