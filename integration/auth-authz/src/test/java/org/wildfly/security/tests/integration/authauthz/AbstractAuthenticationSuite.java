@@ -7,6 +7,7 @@ package org.wildfly.security.tests.integration.authauthz;
 
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
+import org.wildfly.security.tests.common.authauthz.TestContext;
 
 /**
  *
@@ -17,8 +18,14 @@ import org.junit.platform.suite.api.Suite;
 @SelectClasses(value = { DynamicAuthPermutationsSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
 
+    private static TestContext testContext = null;
+
     static String getMode() {
         return "TODO";
+    }
+
+    static TestContext getTestContext() {
+        return testContext;
     }
 
 }
