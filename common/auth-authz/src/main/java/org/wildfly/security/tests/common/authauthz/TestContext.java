@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz;
+package org.wildfly.security.tests.common.authauthz;
 
 import java.util.Map;
 import java.util.Set;
@@ -16,23 +16,23 @@ import java.util.Set;
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
-class TestContext {
+public class TestContext {
 
     private final Map<Transport, Set<String>> transportMechMap;
 
-    TestContext(final Map<Transport, Set<String>> transportMechMap) {
+    public TestContext(final Map<Transport, Set<String>> transportMechMap) {
         this.transportMechMap = transportMechMap;
     }
 
-    Set<Transport> enabledTransports() {
+    public Set<Transport> enabledTransports() {
         return transportMechMap.keySet();
     }
 
-    Set<String> mechanismsForTransport(final Transport transport) {
+    public Set<String> mechanismsForTransport(final Transport transport) {
         return transportMechMap.get(transport);
     }
 
-    enum Transport {
+    public enum Transport {
         HTTP, SASL;
     }
 

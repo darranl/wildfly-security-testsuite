@@ -43,6 +43,11 @@
   </dependencyManagement>
 
   <dependencies>
+    <!-- Testsuite Module Dependencies -->
+    <dependency>
+      <groupId>org.wildfly.security.testsuite</groupId>
+      <artifactId>wildfly-security-common-auth-authz</artifactId>
+    </dependency>
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>

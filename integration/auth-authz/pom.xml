@@ -31,6 +31,12 @@
   <name>wildfly-security-testsuite-integration-auth-authz</name>
 
   <dependencies>
+    <!-- Testsuite Modules-->
+    <dependency>
+      <groupId>org.wildfly.security.testsuite</groupId>
+      <artifactId>wildfly-security-common-auth-authz</artifactId>
+    </dependency>
+
     <!-- Deployment Dependencies -->
 
     <dependency>
