@@ -22,13 +22,13 @@
 
   <parent>
     <groupId>org.wildfly.security.testsuite</groupId>
-    <artifactId>wildfly-security-testsuite-parent</artifactId>
+    <artifactId>wildfly-security-testsuite-unit</artifactId>
     <version>1.0.0.Alpha1-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
-  <artifactId>wildfly-security-auth-authz</artifactId>
-  <name>wildfly-security-testsuite-auth-authz</name>
+  <artifactId>wildfly-security-unit-auth-authz</artifactId>
+  <name>wildfly-security-testsuite-unit-auth-authz</name>
 
   <dependencyManagement>
     <dependencies>

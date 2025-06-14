@@ -90,7 +90,7 @@
   <modules>
     <module>bom</module>
     <module>common</module>
-    <module>auth-authz</module>
+    <module>unit</module>
     <module>integration</module>
   </modules>
 
