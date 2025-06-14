@@ -10,11 +10,10 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createTestServer;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.ldap.DirContextFactory;

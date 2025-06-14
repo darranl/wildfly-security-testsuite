@@ -5,9 +5,10 @@
 
 package org.wildfly.security.tests.integration.authauthz;
 
-import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.getTestContext;
-import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.getMode;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.getMode;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.getTestContext;
+
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;

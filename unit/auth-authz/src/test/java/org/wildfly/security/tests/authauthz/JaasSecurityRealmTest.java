@@ -5,11 +5,10 @@
 
 package org.wildfly.security.tests.authauthz;
 
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createTestServer;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.JaasSecurityRealm;
