@@ -32,6 +32,9 @@
   <name>wildfly-security-testsuite-integration</name>
 
   <properties>
+    <!-- Configuration Properties-->
+    <wildfly.home>server</wildfly.home>
+    <!-- Version Propwerties-->
     <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
     <version.wildfly>36.0.1.Final</version.wildfly>
@@ -95,12 +98,21 @@
           </configuration>
           <executions>
             <execution>
-              <phase>package</phase>
+              <phase>test-compile</phase>
               <goals>
                 <goal>package</goal>
               </goals>
             </execution>
           </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <systemPropertyVariables>
+              <jboss.home>${wildfly.home}</jboss.home>
+            </systemPropertyVariables>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>

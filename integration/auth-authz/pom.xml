@@ -31,6 +31,21 @@
   <name>wildfly-security-testsuite-integration-auth-authz</name>
 
   <dependencies>
+    <!-- Deployment Dependencies -->
+
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- Test Client Dependencies-->
+    <dependency>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+    </dependency>
+
+    <!-- Test Framework Dependencies-->
     <dependency>
       <groupId>org.jboss.arquillian.junit5</groupId>
       <artifactId>arquillian-junit5-container</artifactId>
