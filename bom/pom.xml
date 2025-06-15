@@ -32,6 +32,7 @@
   <name>wildfly-security-testsuite-bom</name>
 
   <properties>
+    <version.io.undertow>2.3.18.Final</version.io.undertow>
     <version.org.apache.directory.api>2.1.7</version.org.apache.directory.api>
     <version.org.apache.directory.jdbm>2.0.0-M3</version.org.apache.directory.jdbm>
     <version.org.apache.directory.server>2.0.0.AM27</version.org.apache.directory.server>
@@ -49,6 +50,28 @@
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>io.undertow</groupId>
+        <artifactId>undertow-core</artifactId>
+        <version>${version.io.undertow}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.undertow</groupId>
+        <artifactId>undertow-servlet</artifactId>
+        <version>${version.io.undertow}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>org.apache.directory.api</groupId>
         <artifactId>api-ldap-codec-standalone</artifactId>

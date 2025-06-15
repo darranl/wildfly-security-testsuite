@@ -36,6 +36,7 @@ import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
 import org.wildfly.security.sasl.util.ServiceLoaderSaslServerFactory;
+import org.wildfly.security.tests.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.common.authauthz.TestContext;
 import org.xnio.OptionMap;
 import org.xnio.Options;
@@ -47,7 +48,8 @@ import org.xnio.Options;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(value = {DynamicAuthPermutationsSuiteRunner.class})
+@SelectClasses(value = {DynamicAuthPermutationsSuiteRunner.class,
+        StandardHttpSuiteRunner.class})
 public abstract class AbstractAuthenticationSuite {
 
     /*
@@ -86,11 +88,11 @@ public abstract class AbstractAuthenticationSuite {
         AbstractAuthenticationSuite.mode = mode;
     }
 
-    static String getMode() {
+    public static String getMode() {
         return mode;
     }
 
-    static TestContext getTestContext() {
+    public static TestContext getTestContext() {
         return testContext;
     }
 
