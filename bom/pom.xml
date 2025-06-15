@@ -32,6 +32,7 @@
   <name>wildfly-security-testsuite-bom</name>
 
   <properties>
+    <version.io.undertow>2.3.18.Final</version.io.undertow>
     <version.org.apache.directory.api>2.1.7</version.org.apache.directory.api>
     <version.org.apache.directory.jdbm>2.0.0-M3</version.org.apache.directory.jdbm>
     <version.org.apache.directory.server>2.0.0.AM27</version.org.apache.directory.server>
@@ -44,10 +45,33 @@
     <version.org.wildfly.client.config>1.0.1.Final</version.org.wildfly.client.config>
     <version.org.wildfly.common>1.7.0.Final</version.org.wildfly.common>
     <version.org.wildfly.elytron>2.6.4.Final</version.org.wildfly.elytron>
+    <version.org.wildfly.elytron.web>4.1.2.Final</version.org.wildfly.elytron.web>
   </properties>
 
   <dependencyManagement>
     <dependencies>
+      <dependency>
+        <groupId>io.undertow</groupId>
+        <artifactId>undertow-core</artifactId>
+        <version>${version.io.undertow}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>io.undertow</groupId>
+        <artifactId>undertow-servlet</artifactId>
+        <version>${version.io.undertow}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>org.apache.directory.api</groupId>
         <artifactId>api-ldap-codec-standalone</artifactId>
@@ -445,6 +469,28 @@
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-util</artifactId>
         <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security.elytron-web</groupId>
+        <artifactId>undertow-server</artifactId>
+        <version>${version.org.wildfly.elytron.web}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security.elytron-web</groupId>
+        <artifactId>undertow-server-servlet</artifactId>
+        <version>${version.org.wildfly.elytron.web}</version>
         <exclusions>
           <exclusion>
             <groupId>*</groupId>

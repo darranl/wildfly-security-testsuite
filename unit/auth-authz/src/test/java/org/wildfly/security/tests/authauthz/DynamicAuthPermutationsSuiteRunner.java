@@ -26,6 +26,8 @@ import javax.security.sasl.SaslException;
 
 import org.jboss.remoting3.Connection;
 import org.jboss.remoting3.Endpoint;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.auth.client.AuthenticationConfiguration;
@@ -43,8 +45,19 @@ import org.xnio.IoFuture;
  */
 public class DynamicAuthPermutationsSuiteRunner {
 
+    @BeforeAll
+    public static void beforeAll() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->beforeAll()");
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->beforeEach()");
+    }
+
     @TestFactory
     Stream<DynamicTest> dynamicSaslTests() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->dynamicSaslTests");
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         TestContext testContext = getTestContext();
@@ -67,31 +80,8 @@ public class DynamicAuthPermutationsSuiteRunner {
     }
 
     @TestFactory
-    Stream<DynamicTest> dynamicHttpTests() {
-        List<DynamicTest> dynamicTests = new ArrayList<>();
-
-        TestContext testContext = getTestContext();
-        if (testContext != null && testContext.enabledTransports().contains(Transport.HTTP)) {
-            final String mode = getMode();
-            testContext.mechanismsForTransport(Transport.HTTP).forEach(
-                    s -> {
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpSuccess(%s)", mode, s),
-                                () -> testHttpSuccess(s)));
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpBadUsername(%s)", mode, s),
-                                () -> testHttpBadUsername(s)));
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpBadPassword(%s)", mode, s),
-                                () -> testHttpBadPassword(s)));
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpBruteForce(%s)", mode, s),
-                                () -> testHttpBruteForce(s)));
-                    }
-            );
-        }
-
-        return dynamicTests.stream();
-    }
-
-    @TestFactory
     Stream<DynamicTest> dynamicTests() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->dynamicTests");
         return Stream.of(Transport.values())
                 .map(t ->
                     dynamicTest("My Test",
@@ -152,18 +142,6 @@ public class DynamicAuthPermutationsSuiteRunner {
 
     public void testSaslBruteForce(final String mechanism) {
         System.out.printf("testSaslBruteForce(%s)\n", mechanism);
-    }
-
-    public void testHttpSuccess(final String mechanism) {
-        System.out.printf("testHttpSuccess(%s)\n", mechanism);
-    }
-
-    public void testHttpBadUsername(final String mechanism) {
-        System.out.printf("testHttpBadUsername(%s)\n", mechanism);
-    }
-
-    public void testHttpBadPassword(final String mechanism) {
-        System.out.printf("testHttpBadPassword(%s)\n", mechanism);
     }
 
     public void testHttpBruteForce(final String mechanism) {
