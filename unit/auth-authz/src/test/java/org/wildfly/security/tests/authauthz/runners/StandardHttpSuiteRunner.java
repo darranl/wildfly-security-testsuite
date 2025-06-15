@@ -5,18 +5,16 @@
 
 package org.wildfly.security.tests.authauthz.runners;
 
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getMode;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.getTestContext;
-
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.wildfly.security.tests.common.authauthz.TestContext;
-import org.wildfly.security.tests.common.authauthz.TestContext.Transport;
+import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 
 /**
  * A runner for standard HTTP authentication against the configured {@code SecurityRealm}.
@@ -36,33 +34,31 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
         System.out.println("StandardHttpSuiteRunner->dynamicHttpTests");
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
-        TestContext testContext = getTestContext();
-        if (testContext != null && testContext.enabledTransports().contains(Transport.HTTP)) {
-            final String mode = getMode();
-            testContext.mechanismsForTransport(Transport.HTTP).forEach(
-                    s -> {
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpSuccess(%s)", mode, s),
-                                () -> testHttpSuccess(s)));
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpBadUsername(%s)", mode, s),
-                                () -> testHttpBadUsername(s)));
-                        dynamicTests.add(dynamicTest(String.format("[%s] testHttpBadPassword(%s)", mode, s),
-                                () -> testHttpBadPassword(s)));
-                    }
-            );
-        }
+        Set<HttpAuthenticationMechanism> supportedMechnisms =
+                AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms();
+
+        String realmType = AbstractAuthenticationSuite.realmType();
+        supportedMechnisms.forEach(s -> {
+            dynamicTests.add(
+                    dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testHttpSuccess(s)));
+            dynamicTests.add(
+                    dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s), () -> testHttpBadUsername(s)));
+            dynamicTests.add(
+                    dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s), () -> testHttpBadPassword(s)));
+        });
 
         return dynamicTests.stream();
     }
 
-    public void testHttpSuccess(final String mechanism) {
+    public void testHttpSuccess(final HttpAuthenticationMechanism mechanism) {
         System.out.printf("testHttpSuccess(%s)\n", mechanism);
     }
 
-    public void testHttpBadUsername(final String mechanism) {
+    public void testHttpBadUsername(final HttpAuthenticationMechanism mechanism) {
         System.out.printf("testHttpBadUsername(%s)\n", mechanism);
     }
 
-    public void testHttpBadPassword(final String mechanism) {
+    public void testHttpBadPassword(final HttpAuthenticationMechanism mechanism) {
         System.out.printf("testHttpBadPassword(%s)\n", mechanism);
     }
 }

@@ -37,6 +37,8 @@ import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
 import org.wildfly.security.sasl.util.ServiceLoaderSaslServerFactory;
 import org.wildfly.security.tests.authauthz.runners.StandardHttpSuiteRunner;
+import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.TestContext;
 import org.xnio.OptionMap;
 import org.xnio.Options;
@@ -66,8 +68,50 @@ public abstract class AbstractAuthenticationSuite {
     private static Closeable streamServer;
     private static String providerName;
     private static TestContext testContext;
-
     private static String mode = "";
+    // New Test State
+    private static volatile String realmType;
+    private static volatile Supplier<SecurityRealm> securityRealmSupplier;
+    private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
+    private static volatile Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms;
+
+    /*
+     * New Registration Methods
+     */
+    public static void register(String realmType, Supplier<SecurityRealm> securityRealmSupplier,
+            Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms,
+            Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms) {
+        AbstractAuthenticationSuite.realmType = realmType;
+        AbstractAuthenticationSuite.securityRealmSupplier = securityRealmSupplier;
+        AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms = supportedHttpAuthenticationMechanisms;
+        AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms = supportedSaslAuthenticationMechanisms;
+    }
+
+    public static String realmType() {
+        return realmType;
+    }
+
+    public static SecurityDomain createSecurityDomain() {
+        final SecurityDomain.Builder domainBuilder = SecurityDomain.builder();
+        domainBuilder.addRealm(REALM_NAME, securityRealmSupplier.get()).build();
+        domainBuilder.setDefaultRealmName(REALM_NAME);
+
+        // Just grant login permission for now.
+        domainBuilder.setPermissionMapper(
+                (p, r) -> PermissionVerifier.from(new LoginPermission()));
+
+        return domainBuilder.build();
+    }
+
+    public static Set<HttpAuthenticationMechanism> supportedHttpAuthenticationMechanisms() {
+        return supportedHttpAuthenticationMechanisms == null ? Collections.emptySet()
+                : supportedHttpAuthenticationMechanisms.get();
+    }
+
+    public static Set<SaslAuthenticationMechanism> supportedSaslAuthenticationMechanisms() {
+        return supportedSaslAuthenticationMechanisms == null ? Collections.emptySet()
+                : supportedSaslAuthenticationMechanisms.get();
+    }
 
     @AfterSuite
     public static void endSuite() throws IOException {
