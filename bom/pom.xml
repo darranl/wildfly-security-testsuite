@@ -44,6 +44,7 @@
     <version.org.wildfly.client.config>1.0.1.Final</version.org.wildfly.client.config>
     <version.org.wildfly.common>1.7.0.Final</version.org.wildfly.common>
     <version.org.wildfly.elytron>2.6.4.Final</version.org.wildfly.elytron>
+    <version.org.wildfly.elytron.web>4.1.2.Final</version.org.wildfly.elytron.web>
   </properties>
 
   <dependencyManagement>
@@ -445,6 +446,28 @@
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-util</artifactId>
         <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security.elytron-web</groupId>
+        <artifactId>undertow-server</artifactId>
+        <version>${version.org.wildfly.elytron.web}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security.elytron-web</groupId>
+        <artifactId>undertow-server-servlet</artifactId>
+        <version>${version.org.wildfly.elytron.web}</version>
         <exclusions>
           <exclusion>
             <groupId>*</groupId>
