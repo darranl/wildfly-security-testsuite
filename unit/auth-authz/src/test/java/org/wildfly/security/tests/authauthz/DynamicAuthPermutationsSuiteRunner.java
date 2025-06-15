@@ -26,6 +26,8 @@ import javax.security.sasl.SaslException;
 
 import org.jboss.remoting3.Connection;
 import org.jboss.remoting3.Endpoint;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.auth.client.AuthenticationConfiguration;
@@ -43,8 +45,19 @@ import org.xnio.IoFuture;
  */
 public class DynamicAuthPermutationsSuiteRunner {
 
+    @BeforeAll
+    public static void beforeAll() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->beforeAll()");
+    }
+
+    @BeforeEach
+    public void beforeEach() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->beforeEach()");
+    }
+
     @TestFactory
     Stream<DynamicTest> dynamicSaslTests() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->dynamicSaslTests");
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         TestContext testContext = getTestContext();
@@ -68,6 +81,7 @@ public class DynamicAuthPermutationsSuiteRunner {
 
     @TestFactory
     Stream<DynamicTest> dynamicHttpTests() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->dynamicHttpTests");
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         TestContext testContext = getTestContext();
@@ -92,6 +106,7 @@ public class DynamicAuthPermutationsSuiteRunner {
 
     @TestFactory
     Stream<DynamicTest> dynamicTests() {
+        System.out.println("DynamicAuthPermutationsSuiteRunner->dynamicTests");
         return Stream.of(Transport.values())
                 .map(t ->
                     dynamicTest("My Test",
