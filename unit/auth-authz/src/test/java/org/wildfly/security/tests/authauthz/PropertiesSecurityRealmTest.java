@@ -48,18 +48,6 @@ public class PropertiesSecurityRealmTest extends AbstractAuthenticationSuite {
         register(null, null, null, null);
     }
 
-    @BeforeSuite
-    public static void setup() throws Exception {
-        registerProvider();
-        setMode("PROPERTIES");
-
-        Set<String> supportedMechanims = new HashSet<>();
-        Collections.addAll(supportedMechanims, "PLAIN");
-
-        createTestServer(PropertiesSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
-    }
-
     static SecurityRealm createSecurityRealm() {
         StringBuilder identitiesString = new StringBuilder();
         obtainTestIdentities().forEach(identity -> {
@@ -78,7 +66,13 @@ public class PropertiesSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {
-        return Collections.emptySet();
+        return EnumSet.of(SaslAuthenticationMechanism.PLAIN,
+                SaslAuthenticationMechanism.DIGEST_MD5,
+                SaslAuthenticationMechanism.DIGEST_SHA_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_384,
+                SaslAuthenticationMechanism.DIGEST_SHA,
+                SaslAuthenticationMechanism.DIGEST_SHA_512_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_512);
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {

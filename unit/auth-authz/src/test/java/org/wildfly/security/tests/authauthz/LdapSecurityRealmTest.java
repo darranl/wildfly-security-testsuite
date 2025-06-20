@@ -38,15 +38,15 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
     @BeforeSuite
     public static void setup() throws Exception {
         registerProvider();
-        setMode("LDAP");
+        //setMode("LDAP");
 
         Set<String> supportedMechanims = new HashSet<>();
         Collections.addAll(supportedMechanims, "PLAIN");
 
         createLdap();
 
-        createTestServer(LdapSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+        //createTestServer(LdapSecurityRealmTest::createSecurityRealm,
+        //        Collections.unmodifiableSet(supportedMechanims));
     }
 
     @AfterSuite

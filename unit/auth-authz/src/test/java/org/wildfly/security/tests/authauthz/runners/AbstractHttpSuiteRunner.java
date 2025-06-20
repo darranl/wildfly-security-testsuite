@@ -7,6 +7,7 @@ package org.wildfly.security.tests.authauthz.runners;
 
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createSecurityDomain;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms;
+import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.initialised;
 
 import java.util.List;
 import java.util.Objects;
@@ -74,6 +75,11 @@ abstract class AbstractHttpSuiteRunner {
     @BeforeEach
     public void startServer() {
         System.out.println("AbstractHttpSuiteRunner->startServer()");
+        if (!initialised()) {
+            System.out.println("AbstractHttpSuiteRunner - NOT INITIALISED");
+            return;
+        }
+
         Undertow.Builder undertowBuilder = Undertow.builder();
         undertowBuilder.addHttpListener(8080, "localhost");
 

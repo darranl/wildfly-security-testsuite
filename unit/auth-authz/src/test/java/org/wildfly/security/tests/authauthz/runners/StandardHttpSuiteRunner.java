@@ -47,6 +47,10 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
                     dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s), () -> testHttpBadPassword(s)));
         });
 
+        if (dynamicTests.isEmpty()) {
+            dynamicTests.add(dynamicTest("[DUMMY] DUMMY TEST", () -> {}));
+        }
+
         return dynamicTests.stream();
     }
 

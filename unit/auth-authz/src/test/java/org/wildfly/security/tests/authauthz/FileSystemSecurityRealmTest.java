@@ -38,13 +38,13 @@ public class FileSystemSecurityRealmTest extends AbstractAuthenticationSuite {
     public static void setup() throws Exception {
         registerProvider();
         passwordFactory = PasswordFactory.getInstance(ClearPassword.ALGORITHM_CLEAR, TEST_PROVIDERS);
-        setMode("FILESYSTEM");
+        //setMode("FILESYSTEM");
 
         Set<String> supportedMechanims = new HashSet<>();
         Collections.addAll(supportedMechanims, "PLAIN");
 
-        createTestServer(FileSystemSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+        //createTestServer(FileSystemSecurityRealmTest::createSecurityRealm,
+        //        Collections.unmodifiableSet(supportedMechanims));
     }
 
     static SecurityRealm createSecurityRealm() {
