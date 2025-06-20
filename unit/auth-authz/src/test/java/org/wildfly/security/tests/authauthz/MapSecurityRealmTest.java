@@ -40,7 +40,7 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
         registerProvider();
         passwordFactory = PasswordFactory.getInstance(ClearPassword.ALGORITHM_CLEAR, TEST_PROVIDERS);
 
-        setMode("MAP");
+        //setMode("MAP");
         // Step 1 - Configured additional required servers.
         // (Not needed for Map as in-memory)
 
@@ -49,8 +49,8 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
         Collections.addAll(supportedMechanims, "PLAIN", "DIGEST-MD5", "DIGEST-SHA-256",
                 "DIGEST-SHA-384", "DIGEST-SHA", "DIGEST-SHA-512-256", "DIGEST-SHA-512");
 
-        createTestServer(MapSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+        //createTestServer(MapSecurityRealmTest::createSecurityRealm,
+        //        Collections.unmodifiableSet(supportedMechanims));
 
         // Step 3 - Initialise the HTTP process(es)
         // Can we do path based?

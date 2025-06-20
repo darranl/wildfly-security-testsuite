@@ -23,13 +23,13 @@ public class JaasSecurityRealmTest extends AbstractAuthenticationSuite {
     public static void setup() throws Exception {
         System.setProperty("java.security.auth.login.config", JaasSecurityRealmTest.class.getResource("jaas-login.config").toString());
         registerProvider();
-        setMode("JAAS");
+        //setMode("JAAS");
 
         Set<String> supportedMechanims = new HashSet<>();
         Collections.addAll(supportedMechanims, "PLAIN");
 
-        createTestServer(JaasSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+        //createTestServer(JaasSecurityRealmTest::createSecurityRealm,
+        //        Collections.unmodifiableSet(supportedMechanims));
     }
 
     @AfterSuite

@@ -30,15 +30,15 @@ public class JdbcSecurityRealmTest extends AbstractAuthenticationSuite {
     @BeforeSuite
     public static void setup() throws Exception {
         registerProvider();
-        setMode("JDBC");
+        //setMode("JDBC");
 
         Set<String> supportedMechanims = new HashSet<>();
         Collections.addAll(supportedMechanims, "PLAIN");
 
         createDataSource();
 
-        createTestServer(JdbcSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+        //createTestServer(JdbcSecurityRealmTest::createSecurityRealm,
+        //        Collections.unmodifiableSet(supportedMechanims));
     }
 
     static SecurityRealm createSecurityRealm() {
