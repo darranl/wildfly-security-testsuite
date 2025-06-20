@@ -12,6 +12,18 @@ package org.wildfly.security.tests.common.authauthz;
  */
 public enum HttpAuthenticationMechanism {
 
-    BASIC, DIGEST_MD5, FORM, PROGRAMATIC
+    BASIC("BASIC"),
+    DIGEST_MD5("DIGEST"),
+    FORM("FORM"),
+    PROGRAMATIC(null);
 
+    private final String mechanismName;
+
+    HttpAuthenticationMechanism(final String mechanismName) {
+        this.mechanismName = mechanismName;
+    }
+
+    public String getMechanismName() {
+        return mechanismName;
+    }
 }

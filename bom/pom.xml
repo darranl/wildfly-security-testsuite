@@ -33,6 +33,7 @@
 
   <properties>
     <version.io.undertow>2.3.18.Final</version.io.undertow>
+    <version.jakarta.servlet.jakarta-servlet-api>6.0.0</version.jakarta.servlet.jakarta-servlet-api>
     <version.org.apache.directory.api>2.1.7</version.org.apache.directory.api>
     <version.org.apache.directory.jdbm>2.0.0-M3</version.org.apache.directory.jdbm>
     <version.org.apache.directory.server>2.0.0.AM27</version.org.apache.directory.server>
@@ -50,6 +51,7 @@
 
   <dependencyManagement>
     <dependencies>
+      <!-- Undertow -->
       <dependency>
         <groupId>io.undertow</groupId>
         <artifactId>undertow-core</artifactId>
@@ -72,6 +74,20 @@
           </exclusion>
         </exclusions>
       </dependency>
+      
+      <!-- Jakarta EE-->
+      <dependency>
+        <groupId>jakarta.servlet</groupId>
+        <artifactId>jakarta.servlet-api</artifactId>
+        <version>${version.jakarta.servlet.jakarta-servlet-api}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      
       <dependency>
         <groupId>org.apache.directory.api</groupId>
         <artifactId>api-ldap-codec-standalone</artifactId>
@@ -258,6 +274,17 @@
       </dependency>
       <dependency>
         <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-auth-server-http</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-base</artifactId>
         <version>${version.org.wildfly.elytron}</version>
         <exclusions>
@@ -303,6 +330,50 @@
       <dependency>
         <groupId>org.wildfly.security</groupId>
         <artifactId>wildfly-elytron-http</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-http-basic</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-http-form</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-http-digest</artifactId>
+        <version>${version.org.wildfly.elytron}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>*</groupId>
+            <artifactId>*</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-http-util</artifactId>
         <version>${version.org.wildfly.elytron}</version>
         <exclusions>
           <exclusion>

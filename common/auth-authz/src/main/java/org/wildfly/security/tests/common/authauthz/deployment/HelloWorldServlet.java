@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.integration.authauthz;
+package org.wildfly.security.tests.common.authauthz.deployment;
 
 import java.io.IOException;
 import java.io.PrintWriter;
