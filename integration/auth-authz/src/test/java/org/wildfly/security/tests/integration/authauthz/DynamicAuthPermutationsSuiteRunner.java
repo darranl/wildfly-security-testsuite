@@ -25,6 +25,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.tests.common.authauthz.TestContext;
 import org.wildfly.security.tests.common.authauthz.TestContext.Transport;
+import org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet;
 
 /**
  *
