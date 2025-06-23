@@ -88,19 +88,19 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
     public void testSaslSuccess(final SaslAuthenticationMechanism mechanism) throws IOException {
         System.out.printf("testSaslSuccess(%s)\n", mechanism);
 
-        performSaslTest(mechanism.name(), "user1", "password1", true);
+        performSaslTest(mechanism.getMechanismName(), "user1", "password1", true);
     }
 
     public void testSaslBadUsername(final SaslAuthenticationMechanism mechanism) throws IOException {
         System.out.printf("testSaslBadUsername(%s)\n", mechanism);
 
-        performSaslTest(mechanism.name(), "Bob", "password1", false);
+        performSaslTest(mechanism.getMechanismName(), "Bob", "password1", false);
     }
 
     public void testSaslBadPassword(final SaslAuthenticationMechanism mechanism) throws IOException {
         System.out.printf("testSaslBadPassword(%s)\n", mechanism);
 
-        performSaslTest(mechanism.name(), "user1", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
     }
 
     private void performSaslTest(final String mechanism, final String userName,

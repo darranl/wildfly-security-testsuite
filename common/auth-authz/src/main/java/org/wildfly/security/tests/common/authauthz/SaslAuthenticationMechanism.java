@@ -12,12 +12,22 @@ package org.wildfly.security.tests.common.authauthz;
  */
 public enum SaslAuthenticationMechanism {
 
-    PLAIN,
-    DIGEST_MD5,
-    DIGEST_SHA_256,
-    DIGEST_SHA_384,
-    DIGEST_SHA,
-    DIGEST_SHA_512_256,
-    DIGEST_SHA_512
+    PLAIN("PLAIN"),
+    DIGEST_MD5("DIGEST-MD5"),
+    DIGEST_SHA_256("DIGEST-SHA-256"),
+    DIGEST_SHA_384("DIGEST-SHA-384"),
+    DIGEST_SHA("DIGEST-SHA"),
+    DIGEST_SHA_512_256("DIGEST-SHA-512-256"),
+    DIGEST_SHA_512("DIGEST-SHA-512");
+
+    private final String mechanismName;
+
+    SaslAuthenticationMechanism(final String mechanismName) {
+        this.mechanismName = mechanismName;
+    }
+
+    public String getMechanismName() {
+        return mechanismName;
+    }
 
 }

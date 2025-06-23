@@ -60,7 +60,7 @@ abstract class AbstractSaslSuiteRunner {
         SaslServerFactory saslServerFactory = new ServiceLoaderSaslServerFactory(AbstractAuthenticationSuite.class.getClassLoader());
 
         Set<String> supportedMechanismNames = supportedSaslAuthenticationMechanisms().stream()
-                .map(SaslAuthenticationMechanism::toString)
+                .map(SaslAuthenticationMechanism::getMechanismName)
                 .collect(toSet());
         SaslAuthenticationFactory saslAuthenticationFactory =  SaslAuthenticationFactory.builder()
                 .setSecurityDomain(createSecurityDomain())
