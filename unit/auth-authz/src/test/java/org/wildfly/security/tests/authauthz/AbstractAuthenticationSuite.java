@@ -125,7 +125,7 @@ public abstract class AbstractAuthenticationSuite {
 
     static Stream<IdentityDefinition> obtainTestIdentities() {
         // Register a lot of identities so each test can use it's own without
-        // state being contaiminated from other tests.
+        // state being contaminated from other tests.
         List<IdentityDefinition> identities = new ArrayList<>(100);
         for (int i = 0 ; i < 100 ; i++) {
             identities.add(new IdentityDefinition(String.format("user%d", i),

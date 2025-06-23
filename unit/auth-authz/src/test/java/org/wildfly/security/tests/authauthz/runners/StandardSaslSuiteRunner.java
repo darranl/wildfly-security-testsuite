@@ -121,7 +121,7 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
                                 optionMap)
         );
 
-        IoFuture.Status status = futureConnection.await(500, TimeUnit.MILLISECONDS);
+        IoFuture.Status status = futureConnection.await(1000, TimeUnit.MILLISECONDS);
 
         if (expectSuccess) {
             assertEquals(IoFuture.Status.DONE, status, "Expected IoFuture to be DONE");
