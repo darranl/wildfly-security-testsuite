@@ -31,6 +31,7 @@ import org.wildfly.security.auth.client.MatchRule;
 import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.xnio.IoFuture;
 
 /**
@@ -54,17 +55,30 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
         Set<SaslAuthenticationMechanism> supportedMechnisms =
                 AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms();
 
+        TestFilter testFilter = TestFilter.getInstance();
+
         String realmType = AbstractAuthenticationSuite.realmType();
         supportedMechnisms.forEach(s -> {
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testSaslSuccess(%s)", realmType, s), () -> testSaslSuccess(s)));
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testSaslBadUsername(%s)", realmType, s), () -> testSaslBadUsername(s)));
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testSaslBadPassword(%s)", realmType, s), () -> testSaslBadPassword(s)));
+            if (testFilter.shouldRunTest(s, "Success")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testSaslSuccess(%s)", realmType, s), () -> testSaslSuccess(s)));
+            }
+
+            if (testFilter.shouldRunTest(s, "BadUsername")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testSaslBadUsername(%s)", realmType, s),
+                                () -> testSaslBadUsername(s)));
+            }
+
+            if (testFilter.shouldRunTest(s, "BadPassword")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testSaslBadPassword(%s)", realmType, s),
+                                () -> testSaslBadPassword(s)));
+            }
         });
 
         if (dynamicTests.isEmpty()) {
+            System.out.println("No Tests Added - Adding a Dummy");
             dynamicTests.add(dynamicTest("[DUMMY] DUMMY TEST", () -> {}));
         }
 

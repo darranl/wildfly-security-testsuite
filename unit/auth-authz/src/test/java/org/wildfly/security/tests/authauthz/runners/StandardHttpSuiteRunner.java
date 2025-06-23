@@ -15,6 +15,7 @@ import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFilter;
 
 /**
  * A runner for standard HTTP authentication against the configured {@code SecurityRealm}.
@@ -37,17 +38,30 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
         Set<HttpAuthenticationMechanism> supportedMechnisms =
                 AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms();
 
+        TestFilter testFilter = TestFilter.getInstance();
+
         String realmType = AbstractAuthenticationSuite.realmType();
         supportedMechnisms.forEach(s -> {
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testHttpSuccess(s)));
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s), () -> testHttpBadUsername(s)));
-            dynamicTests.add(
-                    dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s), () -> testHttpBadPassword(s)));
+            if (testFilter.shouldRunTest(s, "Success")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testHttpSuccess(s)));
+            }
+
+            if (testFilter.shouldRunTest(s, "BadUsername")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s),
+                                () -> testHttpBadUsername(s)));
+            }
+
+            if (testFilter.shouldRunTest(s, "BadPassword")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s),
+                                () -> testHttpBadPassword(s)));
+            }
         });
 
         if (dynamicTests.isEmpty()) {
+            System.out.println("No Tests Added - Adding a Dummy");
             dynamicTests.add(dynamicTest("[DUMMY] DUMMY TEST", () -> {}));
         }
 
