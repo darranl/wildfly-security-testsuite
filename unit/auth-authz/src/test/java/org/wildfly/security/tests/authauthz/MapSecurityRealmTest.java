@@ -7,10 +7,11 @@ package org.wildfly.security.tests.authauthz;
 
 import java.security.spec.InvalidKeySpecException;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
+import org.junit.platform.suite.api.AfterSuite;
 
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.SimpleMapBackedSecurityRealm;
@@ -23,6 +24,8 @@ import org.wildfly.security.password.Password;
 import org.wildfly.security.password.PasswordFactory;
 import org.wildfly.security.password.interfaces.ClearPassword;
 import org.wildfly.security.password.spec.ClearPasswordSpec;
+import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 
 
 /**
@@ -36,29 +39,25 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
 
     @BeforeSuite
     public static void setup() throws Exception {
-        // Step 0 - Pre-Initialisation
+        // Create and local resources needed for the SecurityRealm
         registerProvider();
         passwordFactory = PasswordFactory.getInstance(ClearPassword.ALGORITHM_CLEAR, TEST_PROVIDERS);
+        // Begin any server processes needed by the realm, either in-vm or test containers.
+        //  N/A
+        // Register a factory for instantiating a security realm instance.
+        //  - In integration testing this last step may be register a utility to define the realm in mgmt.
+        register("Map", MapSecurityRealmTest::createSecurityRealm,
+                MapSecurityRealmTest::realmHttpMechanisms,
+                MapSecurityRealmTest::realmSaslMechanisms);
+    }
 
-        //setMode("MAP");
-        // Step 1 - Configured additional required servers.
-        // (Not needed for Map as in-memory)
+    @AfterSuite
+    public static void endRealm() {
+        // Stop any server processes created for the realm either in-vm or test containers.
+        // Clean up any filesystem resources for this realm.
 
-        // Step 2 - Initialise the SecurityDomain
-        Set<String> supportedMechanims = new HashSet<>();
-        Collections.addAll(supportedMechanims, "PLAIN", "DIGEST-MD5", "DIGEST-SHA-256",
-                "DIGEST-SHA-384", "DIGEST-SHA", "DIGEST-SHA-512-256", "DIGEST-SHA-512");
-
-        //createTestServer(MapSecurityRealmTest::createSecurityRealm,
-        //        Collections.unmodifiableSet(supportedMechanims));
-
-        // Step 3 - Initialise the HTTP process(es)
-        // Can we do path based?
-
-        // Step 4 - Initialise the Remoting Connectors
-        // Make authentication swappable or should a single connector support all mechs?
-
-        // Can we get all modes available for a single server process?
+        // This impl was in memory so garbage collection is sufficient.
+        register(null, null, null, null);
     }
 
     static SecurityRealm createSecurityRealm() {
@@ -85,4 +84,21 @@ public class MapSecurityRealmTest extends AbstractAuthenticationSuite {
         }
     }
 
+    static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {
+        return EnumSet.of(SaslAuthenticationMechanism.PLAIN,
+                SaslAuthenticationMechanism.DIGEST_MD5,
+                SaslAuthenticationMechanism.DIGEST_SHA_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_384,
+                SaslAuthenticationMechanism.DIGEST_SHA,
+                SaslAuthenticationMechanism.DIGEST_SHA_512_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_512);
+    }
+
+    static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
+        return Collections.emptySet();
+//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+//                HttpAuthenticationMechanism.DIGEST_MD5,
+//                HttpAuthenticationMechanism.FORM,
+//                HttpAuthenticationMechanism.PROGRAMATIC);
+    }
 }

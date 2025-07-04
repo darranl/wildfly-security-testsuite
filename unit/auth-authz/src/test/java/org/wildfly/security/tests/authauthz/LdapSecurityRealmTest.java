@@ -11,7 +11,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.junit.platform.suite.api.AfterSuite;
@@ -20,6 +20,8 @@ import org.wildfly.security.auth.realm.ldap.DirContextFactory;
 import org.wildfly.security.auth.realm.ldap.LdapSecurityRealmBuilder;
 import org.wildfly.security.auth.realm.ldap.SimpleDirContextFactoryBuilder;
 import org.wildfly.security.auth.server.SecurityRealm;
+import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 
 /**
  * A {@code Suite} instance for testing against a {@code SecurityRealm} backed by an LDAP.
@@ -37,21 +39,23 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
 
     @BeforeSuite
     public static void setup() throws Exception {
-        registerProvider();
-        //setMode("LDAP");
-
-        Set<String> supportedMechanims = new HashSet<>();
-        Collections.addAll(supportedMechanims, "PLAIN");
-
+        // Begin any server processes needed by the realm, either in-vm or test containers.
         createLdap();
-
-        //createTestServer(LdapSecurityRealmTest::createSecurityRealm,
-        //        Collections.unmodifiableSet(supportedMechanims));
+        // Register a factory for instantiating a security realm instance.
+        //  - In integration testing this last step may be register a utility to define the realm in mgmt.
+        register("LDAP", LdapSecurityRealmTest::createSecurityRealm,
+                LdapSecurityRealmTest::realmHttpMechanisms,
+                LdapSecurityRealmTest::realmSaslMechanisms);
     }
 
     @AfterSuite
-    public static void stopLdap() throws IOException {
+    public static void endRealm() throws IOException {
+        // Stop any server processes created for the realm either in-vm or test containers.
+        // Clean up any filesystem resources for this realm.
         ldapService.close();
+
+        // This impl was in memory so garbage collection is sufficient.
+        register(null, null, null, null);
     }
 
     static SecurityRealm createSecurityRealm() {
@@ -88,5 +92,23 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
                 .importLdif(new ByteArrayInputStream(identitiesString.toString().getBytes()))
                 .addTcpServer("Default TCP", "localhost", LDAP_PORT)
                 .start();
+    }
+
+    static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {
+        return EnumSet.of(SaslAuthenticationMechanism.PLAIN,
+                SaslAuthenticationMechanism.DIGEST_MD5,
+                SaslAuthenticationMechanism.DIGEST_SHA_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_384,
+                SaslAuthenticationMechanism.DIGEST_SHA,
+                SaslAuthenticationMechanism.DIGEST_SHA_512_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_512);
+    }
+
+    static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
+        return Collections.emptySet();
+//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+//                HttpAuthenticationMechanism.DIGEST_MD5,
+//                HttpAuthenticationMechanism.FORM,
+//                HttpAuthenticationMechanism.PROGRAMATIC);
     }
 }
