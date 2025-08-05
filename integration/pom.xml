@@ -37,7 +37,7 @@
     <!-- Version Propwerties-->
     <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
-    <version.wildfly>36.0.1.Final</version.wildfly>
+    <version.wildfly>37.0.0.Final</version.wildfly>
   </properties>
 
   <dependencyManagement>
