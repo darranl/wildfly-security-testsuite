@@ -37,6 +37,7 @@
     <!-- Version Propwerties-->
     <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
+    <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
     <version.wildfly>36.0.1.Final</version.wildfly>
   </properties>
 
@@ -62,6 +63,11 @@
         <version>${version.org.wildfly.arquillian}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.extras.creaper</groupId>
+        <artifactId>creaper-core</artifactId>
+        <version>${version.org.wildfly.extras.creaper}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -89,6 +95,7 @@
             <layers>
               <layer>core-server</layer>
               <layer>web-server</layer>
+              <layer>ejb</layer>
             </layers>
             <galleon-options>
               <jboss-maven-dist />
