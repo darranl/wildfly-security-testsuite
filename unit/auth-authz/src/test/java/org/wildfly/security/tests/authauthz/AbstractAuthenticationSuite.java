@@ -30,9 +30,6 @@ import org.wildfly.security.tests.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.authauthz.runners.StandardSaslSuiteRunner;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
-import org.wildfly.security.tests.common.authauthz.TestContext;
-import org.xnio.OptionMap;
-import org.xnio.Options;
 
 /**
  * Base definition of the {@code Suite} of tests that will be used to run the authentication tests

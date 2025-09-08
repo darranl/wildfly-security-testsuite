@@ -7,9 +7,7 @@ package org.wildfly.security.tests.authauthz;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.EnumSet;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.platform.suite.api.AfterSuite;

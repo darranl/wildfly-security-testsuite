@@ -3,7 +3,21 @@
 
 # Project Structure
 
-# Running Individual Tests
+# Test Case Configuration
+
+Various system properties can be set to control either which tests are executed
+or the behaviour of the tests themselves.
+
+## Unit Tests
+
+### HTTP Tests
+
+The following properties can be set to control the HTTP unit tests.
+
+- `http.hostmane` (Default: "localhost") - The host name to bind the HTTP server to.
+- `http.port` (Default: "8080") - The base port number the HTTP server will listen on.
+
+## Running Individual Tests
 
 The test cases in this project make use of suites to dynamically register many
 permutations of tests for each test case, this enables us to cover many more

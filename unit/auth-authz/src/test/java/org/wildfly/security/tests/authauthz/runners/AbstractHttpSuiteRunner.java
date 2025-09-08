@@ -9,6 +9,8 @@ import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.c
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.initialised;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -50,6 +52,14 @@ import org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet;
  */
 abstract class AbstractHttpSuiteRunner {
 
+    private static final String HTTP_HOSTNAME = System.getProperty("http.hostname", "localhost");
+    private static final int HTTP_PORT = Integer.getInteger("http.port", 8080);
+
+    static final String ANONYMOUS = "anonymous";
+    static final String NULL = "null";
+    static final String WWW_AUTHENTICATE = "WWW-Authenticate";
+    static final int HTTP_OK = 200;
+
     private static final String DEPLOYMENT_NAME_TEMPLATE = "%sDeployment.war";
     private static final String CONTEXT_ROOT_PATH_TEMPLATE = "/hello%s";
     private static final String SECURED_PATH = "/secured";
@@ -69,6 +79,11 @@ abstract class AbstractHttpSuiteRunner {
         return String.format(CONTEXT_ROOT_PATH_TEMPLATE, mechanism.name());
     }
 
+    public static URI toURI(final HttpAuthenticationMechanism mechanism, final boolean secured) throws URISyntaxException {
+        return new URI("http", null, HTTP_HOSTNAME, HTTP_PORT,
+         toContextRoot(mechanism) + (secured ? SECURED_PATH : UNSECURED_PATH), null, null);
+    }
+
     /**
      * Set up the server process to be used by the tests.
      */
@@ -81,7 +96,7 @@ abstract class AbstractHttpSuiteRunner {
         }
 
         Undertow.Builder undertowBuilder = Undertow.builder();
-        undertowBuilder.addHttpListener(8080, "localhost");
+        undertowBuilder.addHttpListener(HTTP_PORT, HTTP_HOSTNAME);
 
         PathHandler path = Handlers.path();
 
