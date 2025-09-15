@@ -98,4 +98,8 @@ public class TestFilter {
     public boolean shouldRunTest(SaslAuthenticationMechanism mechanism, String testName) {
         return shouldRunTest(TransportType.SASL, testName) && saslMechanismPredicate.test(mechanism);
     }
+
+    public boolean shouldRunTest(String testName) {
+        return testNamePredicate.test(testName);
+    }
 }

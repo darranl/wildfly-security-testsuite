@@ -42,6 +42,8 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 @RunAsClient
 abstract class AbstractSaslSuiteRunner {
 
+    static String testRealmName;
+
     @Deployment(testable = false)
     public static EnterpriseArchive deployment() {
         EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "sasl-suite.ear");
@@ -55,14 +57,23 @@ abstract class AbstractSaslSuiteRunner {
         return ear;
     }
 
-    protected void performSaslTest(final String mechanism, final String userName, final String password,
+    static void performSaslTest(final String mechanism, final String userName, final String password,
             final boolean expectSuccess) throws Exception {
 
+        configureHttpConnectorSaslAuthn(mechanism);
+        testSaslEjbConnection(mechanism, userName, password, expectSuccess);
+    }
+
+    static void configureHttpConnectorSaslAuthn(final String mechanism) throws Exception {
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
             client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=sasl-auth-%s)", mechanism)).assertSuccess();
             new Administration(client).reloadIfRequired();
         }
+    }
+
+    static void testSaslEjbConnection(final String mechanism, final String userName, final String password,
+            final boolean expectSuccess) throws Exception {
 
         AuthenticationContext authContext = AuthenticationContext.empty()
                 .with(MatchRule.ALL, AuthenticationConfiguration.empty()
@@ -83,7 +94,11 @@ abstract class AbstractSaslSuiteRunner {
 
         try {
             String principalString = authContext.runCallable(callable);
-            assertEquals(principalString, userName);
+            if (expectSuccess) {
+                assertEquals(principalString, userName);
+            } else {
+                fail(String.format("EJBCLIENT000409 exception for mechanism '%s' should be thrown.", mechanism));
+            }
         } catch (Exception e) {
             if (expectSuccess) {
                 fail(String.format("Unexpected exception for mechanism '%s': %s", mechanism, e.getMessage()));
@@ -99,8 +114,6 @@ abstract class AbstractSaslSuiteRunner {
     }
 
     public static class ConfigurationServerSetupTask implements ServerSetupTask {
-
-        private String testRealmName;
 
         @Override
         public void setup(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
@@ -134,8 +147,10 @@ abstract class AbstractSaslSuiteRunner {
                     client.execute(String.format("/subsystem=ejb3/application-security-domain=ejb-app-domain-%s:remove", saslMechName)).assertSuccess();
                     client.execute(String.format("/subsystem=elytron/sasl-authentication-factory=sasl-auth-%s:remove", saslMechName)).assertSuccess();
                     client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-%s:remove", saslMechName)).assertSuccess();
-                    client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
                 }
+                client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
+            } finally {
+                testRealmName = null;
             }
         }
     }
