@@ -57,7 +57,6 @@ abstract class AbstractHttpSuiteRunner {
 
     static final String ANONYMOUS = "anonymous";
     static final String NULL = "null";
-    static final String WWW_AUTHENTICATE = "WWW-Authenticate";
     static final int HTTP_OK = 200;
 
     private static final String DEPLOYMENT_NAME_TEMPLATE = "%sDeployment.war";

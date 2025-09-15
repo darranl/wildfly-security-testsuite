@@ -6,8 +6,6 @@
 package org.wildfly.security.tests.authauthz;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.Provider;
 import java.security.Security;
 import java.util.ArrayList;
