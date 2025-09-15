@@ -15,6 +15,7 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.integration.authauthz.runners.BruteForceAuthnProtectionSaslSuiteRunner;
 import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuiteRunner;
 
 /**
@@ -23,7 +24,7 @@ import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuit
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(value = { StandardSaslSuiteRunner.class })
+@SelectClasses(value = { StandardSaslSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
 
     private static volatile String realmType;

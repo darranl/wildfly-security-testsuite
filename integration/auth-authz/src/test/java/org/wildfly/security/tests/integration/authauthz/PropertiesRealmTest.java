@@ -61,7 +61,7 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
         }
 
         try (PrintStream out = new PrintStream(new FileOutputStream(REALM_ROLES))) {
-            obtainTestIdentities().findFirst().ifPresent(identity -> {
+            obtainTestIdentities().forEach(identity -> {
                 out.println(String.format("%s=%s", identity.username(), "admin"));
             });
         } catch (FileNotFoundException ex) {
