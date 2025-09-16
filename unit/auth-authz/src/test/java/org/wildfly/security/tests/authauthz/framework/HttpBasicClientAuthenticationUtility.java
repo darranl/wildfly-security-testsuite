@@ -64,9 +64,10 @@ class HttpBasicClientAuthenticationUtility implements HttpClientAuthenticationUt
     public <T> Function<HttpResponse<T>, HttpResponse<T>> verifyAuthentication(boolean expectSuccess) {
         if (expectSuccess) {
             Function<HttpResponse<T>, HttpResponse<T>> verifyStatusCode = verifyStatusCode(200);
+            Function<HttpResponse<T>, HttpResponse<T>> verifyNoChallenge = verifyNoChallenge();
             Function<HttpResponse<T>, HttpResponse<T>> verifyPrincipal = verifyPrincipal(username);
 
-            return verifyStatusCode.andThen(verifyPrincipal);
+            return verifyStatusCode.andThen(verifyNoChallenge).andThen(verifyPrincipal);
         } else {
             return verifyChallenge();
         }
