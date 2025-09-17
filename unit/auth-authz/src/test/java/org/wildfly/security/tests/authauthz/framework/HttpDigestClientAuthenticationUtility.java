@@ -153,6 +153,10 @@ public class HttpDigestClientAuthenticationUtility implements HttpClientAuthenti
 
     @Override
     public HttpRequest createRequest(final URI resource) {
+        if (username == null && password == null) {
+            return HttpRequest.newBuilder(resource).build();
+        }
+
         assertNotNull(challengeData, "Challenge data is required");
         assertFalse(challengeData.isEmpty(), "Challenge data must be populated");
 

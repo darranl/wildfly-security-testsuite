@@ -74,9 +74,13 @@ class HttpBasicClientAuthenticationUtility implements HttpClientAuthenticationUt
 
     @Override
     public HttpRequest createRequest(final URI resource) {
-        return HttpRequest.newBuilder(resource)
-            .header(AUTHORIZATION, "Basic " + encodeUsernamePassword())
-            .build();
+        if (username != null && password != null) {
+            return HttpRequest.newBuilder(resource)
+                .header(AUTHORIZATION, "Basic " + encodeUsernamePassword())
+                .build();
+        }
+
+        return HttpRequest.newBuilder(resource).build();
     }
 
     private String encodeUsernamePassword() {

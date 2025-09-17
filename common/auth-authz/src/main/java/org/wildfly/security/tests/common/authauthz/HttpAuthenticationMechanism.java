@@ -15,7 +15,8 @@ public enum HttpAuthenticationMechanism {
     BASIC("BASIC", "Basic"),
     DIGEST_MD5("DIGEST", "Digest"),
     FORM("FORM", null),
-    PROGRAMATIC(null, null);
+    // For the purpose of testing we need it to enable a mech even if we will not use it.
+    PROGRAMMATIC("BASIC", null);
 
     private final String mechanismName;
     private final String challenge;

@@ -92,6 +92,6 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
         return EnumSet.of(HttpAuthenticationMechanism.BASIC,
                 HttpAuthenticationMechanism.DIGEST_MD5,
                 HttpAuthenticationMechanism.FORM,
-                HttpAuthenticationMechanism.PROGRAMATIC);
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }

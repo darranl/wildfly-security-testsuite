@@ -25,9 +25,17 @@ import jakarta.servlet.http.HttpServletResponse;
 public class HelloWorldServlet extends HttpServlet {
 
     public static final String PRINCIPAL_HEADER = "HelloWorldServlet.HttpServletRequest.Principal";
+    public static final String X_USERNAME = "X-USERNAME";
+    public static final String X_PASSWORD = "X-PASSWORD";
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        String username = req.getHeader(X_USERNAME);
+        String password = req.getHeader(X_PASSWORD);
+        if (username != null && password != null) {
+            req.login(username, password);
+        }
+
         Principal p = req.getUserPrincipal();
         resp.addHeader(PRINCIPAL_HEADER, p != null ? p.getName() : "null");
 

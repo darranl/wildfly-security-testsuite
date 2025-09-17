@@ -98,11 +98,12 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
     public void testHttpSuccess(final HttpAuthenticationMechanism mechanism) throws Exception {
         System.out.println("~~ Set Up");
         HttpClient httpClient = newHttpClient();
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = HttpRequest.newBuilder(toURI(mechanism, false)).build();
 
         HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
             .build();
+
+        // Call Unsecured Path to verify accessible
+        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
 
         // Test Requirements:
         // - Response is HTTP 200
@@ -140,11 +141,12 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
     public void testHttpBadUsername(final HttpAuthenticationMechanism mechanism) throws Exception {
         HttpClient httpClient = newHttpClient();
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = HttpRequest.newBuilder(toURI(mechanism, false)).build();
 
         HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
             .build();
+
+        // Call Unsecured Path to verify accessible
+        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
 
         // Test Requirements:
         // - Response is HTTP 200
@@ -172,11 +174,12 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
     public void testHttpBadPassword(final HttpAuthenticationMechanism mechanism) throws Exception {
         HttpClient httpClient = newHttpClient();
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = HttpRequest.newBuilder(toURI(mechanism, false)).build();
 
         HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
             .build();
+
+        // Call Unsecured Path to verify accessible
+        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
 
         // Test Requirements:
         // - Response is HTTP 200

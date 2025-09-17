@@ -84,7 +84,9 @@ public interface HttpClientAuthenticationUtility {
      * @param resource
      * @return
      */
-    public HttpRequest createRequest(final URI resource);
+    default public HttpRequest createRequest(final URI resource) {
+        return HttpRequest.newBuilder(resource).build();
+    }
 
     public static Builder builder(HttpAuthenticationMechanism forMechanism) {
         return new Builder(forMechanism);
@@ -106,6 +108,8 @@ public interface HttpClientAuthenticationUtility {
                     return new HttpDigestClientAuthenticationUtility();
                 case FORM:
                     return new HttpFormClientAuthenticationUtility();
+                case PROGRAMMATIC:
+                    return new HttpProgrammaticClientAuthenticationUtility();
                 default:
                     return null;
             }

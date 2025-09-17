@@ -93,13 +93,4 @@ public class HttpFormClientAuthenticationUtility implements HttpClientAuthentica
             return verifyStatusCode.andThen(formErrorVerification);
         }
     }
-
-    @Override
-    public HttpRequest createRequest(URI resource) {
-        // At this stage the authentication is tracked using a Cookie so nothing special is needed.
-        return HttpRequest.newBuilder(resource)
-            .build();
-    }
-
-
 }
