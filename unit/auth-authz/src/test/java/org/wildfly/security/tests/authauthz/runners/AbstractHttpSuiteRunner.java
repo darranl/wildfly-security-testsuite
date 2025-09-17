@@ -41,6 +41,8 @@ import org.wildfly.security.http.form.FormMechanismFactory;
 import org.wildfly.security.http.util.AggregateServerMechanismFactory;
 import org.wildfly.security.http.util.FilterServerMechanismFactory;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
+import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet;
 
 /**
@@ -200,11 +202,16 @@ abstract class AbstractHttpSuiteRunner {
                 .addServlets(Servlets.servlet(HelloWorldServlet.class)
                                 .addMapping("/")
                                 .addMapping(SECURED_PATH)
-                                .addMapping(UNSECURED_PATH));
+                                .addMapping(UNSECURED_PATH),
+                            Servlets.servlet(FormLoginServlet.class)
+                                .addMapping("/loginForm"),
+                            Servlets.servlet(FormErrorServlet.class)
+                                .addMapping("/errorForm")
+                            );
 
         if (mechanismName != null) {
             deploymentInfo.setLoginConfig(new LoginConfig(mechanismName, "Elytron Realm",
-                    "/login", "/error"));
+                    "/loginForm", "/errorForm"));
         }
 
         return deploymentInfo;

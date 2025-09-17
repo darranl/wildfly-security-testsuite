@@ -104,6 +104,8 @@ public interface HttpClientAuthenticationUtility {
                     return new HttpBasicClientAuthenticationUtility();
                 case DIGEST_MD5:
                     return new HttpDigestClientAuthenticationUtility();
+                case FORM:
+                    return new HttpFormClientAuthenticationUtility();
                 default:
                     return null;
             }
