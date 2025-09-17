@@ -87,6 +87,7 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
 
     public void testHttpSuccess(final HttpAuthenticationMechanism mechanism) throws Exception {
+        System.out.println("~~ Set Up");
         HttpClient httpClient = HttpClient.newHttpClient();
         // Call Unsecured Path to verify accessible
         HttpRequest request = HttpRequest.newBuilder(toURI(mechanism, false)).build();
@@ -98,6 +99,7 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
         // - Response is HTTP 200
         // - No challenge header
         // - Principal is 'null'
+        System.out.println("~~ Insecure Request");
         httpClient.sendAsync(request, BodyHandlers.discarding())
             .thenApply(verifyStatusCode(200))
             .thenApply(verifyNoChallenge())
@@ -105,6 +107,7 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
             .join();
 
         // Call secured path and verify that the expected challenge was returned (as applicable)
+        System.out.println("~~ First Challenge");
         URI securedResource = toURI(mechanism, true);
         request = HttpRequest.newBuilder(securedResource).build();
         httpClient.sendAsync(request, BodyHandlers.discarding())
@@ -112,12 +115,14 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
             .join();
 
         // Generate a response to the challenge
+        System.out.println("~~ Respond to Challenge");
         request = authUtility.createAuthenticationRequest(securedResource, goodUsername, goodPassword);
         httpClient.sendAsync(request, BodyHandlers.discarding())
             .thenApply(authUtility.verifyAuthentication(true))
             .join();
 
         // Call deployment again with the challenge and verify success.
+        System.out.println("~~ Second call");
         request = authUtility.createRequest(securedResource);
         httpClient.sendAsync(request, BodyHandlers.discarding())
             .thenApply(authUtility.verifyAuthentication(true))

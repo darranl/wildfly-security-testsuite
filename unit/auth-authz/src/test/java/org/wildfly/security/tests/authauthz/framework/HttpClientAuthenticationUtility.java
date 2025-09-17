@@ -49,7 +49,10 @@ public interface HttpClientAuthenticationUtility {
      * redirected to a different URI to authenticate.
      *
      * For header based authentication where we do not rely on an authenticated session
-     * the username and password may be cached for subsequent requests/
+     * the username and password may be cached for subsequent requests.
+     *
+     * For mechanisms that rely on responding to a challenge this method may depend upon
+     * that previously captured data when verifying a challenge.
      *
      * @param resource the target resource.
      * @param username the username to use for authentication.
@@ -99,6 +102,8 @@ public interface HttpClientAuthenticationUtility {
             switch (mechanism) {
                 case BASIC:
                     return new HttpBasicClientAuthenticationUtility();
+                case DIGEST_MD5:
+                    return new HttpDigestClientAuthenticationUtility();
                 default:
                     return null;
             }

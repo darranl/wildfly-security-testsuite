@@ -5,13 +5,12 @@
 
 package org.wildfly.security.tests.authauthz.framework;
 
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.AUTHORIZATION;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
+import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.AUTHORIZATION;
 import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyMechanismChallenge;
+import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
+import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
+import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
