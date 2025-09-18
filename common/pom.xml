@@ -31,6 +31,18 @@
   <packaging>pom</packaging>
   <name>wildfly-security-testsuite-common</name>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.wildfly.security.testsuite</groupId>
+        <artifactId>wildfly-security-testsuite-bom</artifactId>
+        <version>${version.org.wildfly.security.testsuite.wildfly-security-testsuite-bom}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
     <module>auth-authz</module>
   </modules>

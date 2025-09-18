@@ -45,6 +45,27 @@
   <dependencies>
     <!-- Testsuite Module Dependencies -->
     <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.undertow</groupId>
+      <artifactId>undertow-servlet</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.authentication</groupId>
+      <artifactId>jakarta.authentication-api</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>jakarta.servlet</groupId>
+      <artifactId>jakarta.servlet-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.wildfly.security.testsuite</groupId>
       <artifactId>wildfly-security-common-auth-authz</artifactId>
     </dependency>
@@ -110,6 +131,11 @@
     </dependency>
     <dependency>
       <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-auth-server-http</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-base</artifactId>
       <scope>test</scope>
     </dependency>
@@ -135,12 +161,37 @@
     </dependency>
     <dependency>
       <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-http-basic</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-http-digest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-http-form</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-http-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-mechanism</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-mechanism-digest</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-mechanism-http</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -206,6 +257,18 @@
     <dependency>
       <groupId>org.wildfly.security</groupId>
       <artifactId>wildfly-elytron-util</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- Elytron Web -->
+    <dependency>
+      <groupId>org.wildfly.security.elytron-web</groupId>
+      <artifactId>undertow-server</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security.elytron-web</groupId>
+      <artifactId>undertow-server-servlet</artifactId>
       <scope>test</scope>
     </dependency>
 

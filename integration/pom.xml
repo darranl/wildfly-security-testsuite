@@ -33,10 +33,12 @@
 
   <properties>
     <!-- Configuration Properties-->
-    <wildfly.home>server</wildfly.home>
-    <!-- Version Propwerties-->
+    <wildfly.home>${project.build.directory}/server</wildfly.home>
+    <!-- Version Properties-->
+    <version.org.apache.maven.plugins.maven-antrun-plugin>3.1.0</version.org.apache.maven.plugins.maven-antrun-plugin>
     <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
     <version.org.wildfly.arquillian>5.1.0.Beta11</version.org.wildfly.arquillian>
+    <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
     <version.wildfly>36.0.1.Final</version.wildfly>
   </properties>
 
@@ -62,6 +64,11 @@
         <version>${version.org.wildfly.arquillian}</version>
         <type>pom</type>
         <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.extras.creaper</groupId>
+        <artifactId>creaper-core</artifactId>
+        <version>${version.org.wildfly.extras.creaper}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -89,6 +96,7 @@
             <layers>
               <layer>core-server</layer>
               <layer>web-server</layer>
+              <layer>ejb</layer>
             </layers>
             <galleon-options>
               <jboss-maven-dist />
@@ -101,6 +109,38 @@
               <phase>test-compile</phase>
               <goals>
                 <goal>package</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>${version.org.apache.maven.plugins.maven-antrun-plugin}</version>
+          <executions>
+            <!-- If jboss.dist is set, all files from ${jboss.dist} are copied to ${wildfly.home} -->
+            <execution>
+              <id>copy-jboss-from-dist</id>
+              <phase>generate-test-resources</phase>
+              <configuration>
+                <target if="jboss.dist">
+                  <delete dir="${wildfly.home}" quiet="true" />
+                  <copy todir="${wildfly.home}">
+                    <fileset dir="${jboss.dist}" />
+                  </copy>
+                  <!-- as copy ant task doesn't preserve permissions we have to explicitly set +x permission -->
+                  <exec executable="chmod">
+                    <arg value="u+x"/>
+                    <arg value="${wildfly.home}/bin/jboss-cli.sh"/>
+                    <arg value="${wildfly.home}/bin/standalone.sh"/>
+                    <arg value="${wildfly.home}/bin/jboss-cli.bat"/>
+                    <arg value="${wildfly.home}/bin/jdr.sh"/>
+                    <arg value="${wildfly.home}/bin/jdr.bat"/>
+                  </exec>
+                </target>
+              </configuration>
+              <goals>
+                <goal>run</goal>
               </goals>
             </execution>
           </executions>

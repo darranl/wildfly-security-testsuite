@@ -10,15 +10,18 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collections;
-import java.util.HashSet;
+import java.util.EnumSet;
 import java.util.Set;
 
 import org.hsqldb.jdbc.JDBCDataSource;
+import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.realm.jdbc.JdbcSecurityRealm;
 import org.wildfly.security.auth.realm.jdbc.mapper.PasswordKeyMapper;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.password.interfaces.ClearPassword;
+import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 
 /**
  * A {@code Suite} instance for testing against a {@code SecurityRealm} backed by a database.
@@ -29,16 +32,24 @@ public class JdbcSecurityRealmTest extends AbstractAuthenticationSuite {
 
     @BeforeSuite
     public static void setup() throws Exception {
-        registerProvider();
-        setMode("JDBC");
-
-        Set<String> supportedMechanims = new HashSet<>();
-        Collections.addAll(supportedMechanims, "PLAIN");
-
+        // Create and local resources needed for the SecurityRealm
         createDataSource();
+        // Begin any server processes needed by the realm, either in-vm or test containers.
+        //  N/A
+        // Register a factory for instantiating a security realm instance.
+        //  - In integration testing this last step may be register a utility to define the realm in mgmt.
+        register("Map", JdbcSecurityRealmTest::createSecurityRealm,
+                JdbcSecurityRealmTest::realmHttpMechanisms,
+                JdbcSecurityRealmTest::realmSaslMechanisms);
+    }
 
-        createTestServer(JdbcSecurityRealmTest::createSecurityRealm,
-                Collections.unmodifiableSet(supportedMechanims));
+    @AfterSuite
+    public static void endRealm() {
+        // Stop any server processes created for the realm either in-vm or test containers.
+        // Clean up any filesystem resources for this realm.
+
+        // This impl was in memory so garbage collection is sufficient.
+        register(null, null, null, null);
     }
 
     static SecurityRealm createSecurityRealm() {
@@ -81,5 +92,23 @@ public class JdbcSecurityRealmTest extends AbstractAuthenticationSuite {
                 statement.executeUpdate();
             }
         }
+    }
+
+    static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {
+        return EnumSet.of(SaslAuthenticationMechanism.PLAIN,
+                SaslAuthenticationMechanism.DIGEST_MD5,
+                SaslAuthenticationMechanism.DIGEST_SHA_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_384,
+                SaslAuthenticationMechanism.DIGEST_SHA,
+                SaslAuthenticationMechanism.DIGEST_SHA_512_256,
+                SaslAuthenticationMechanism.DIGEST_SHA_512);
+    }
+
+    static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
+        return Collections.emptySet();
+//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+//                HttpAuthenticationMechanism.DIGEST_MD5,
+//                HttpAuthenticationMechanism.FORM,
+//                HttpAuthenticationMechanism.PROGRAMATIC);
     }
 }
