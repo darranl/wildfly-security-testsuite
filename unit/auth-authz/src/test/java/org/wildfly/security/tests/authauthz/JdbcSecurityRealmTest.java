@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -105,10 +104,9 @@ public class JdbcSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
-        return Collections.emptySet();
-//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
-//                HttpAuthenticationMechanism.DIGEST_MD5,
-//                HttpAuthenticationMechanism.FORM,
-//                HttpAuthenticationMechanism.PROGRAMATIC);
+        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+                HttpAuthenticationMechanism.DIGEST_MD5,
+                HttpAuthenticationMechanism.FORM,
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }
