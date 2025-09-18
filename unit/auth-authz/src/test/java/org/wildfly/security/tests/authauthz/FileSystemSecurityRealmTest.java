@@ -16,8 +16,8 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.junit.platform.suite.api.AfterSuite;
 
+import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.principal.NamePrincipal;
 import org.wildfly.security.auth.realm.FileSystemSecurityRealm;

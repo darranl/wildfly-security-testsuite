@@ -16,6 +16,17 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import io.undertow.Handlers;
+import io.undertow.Undertow;
+import io.undertow.server.handlers.PathHandler;
+import io.undertow.servlet.Servlets;
+import io.undertow.servlet.api.DeploymentInfo;
+import io.undertow.servlet.api.DeploymentManager;
+import io.undertow.servlet.api.LoginConfig;
+import io.undertow.servlet.api.SecurityConstraint;
+import io.undertow.servlet.api.SecurityInfo;
+import io.undertow.servlet.api.WebResourceCollection;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.wildfly.elytron.web.undertow.server.servlet.AuthenticationManager;
@@ -34,18 +45,6 @@ import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet;
-
-import io.undertow.Handlers;
-import io.undertow.Undertow;
-import io.undertow.server.handlers.PathHandler;
-import io.undertow.servlet.Servlets;
-import io.undertow.servlet.api.DeploymentInfo;
-import io.undertow.servlet.api.DeploymentManager;
-import io.undertow.servlet.api.LoginConfig;
-import io.undertow.servlet.api.SecurityConstraint;
-import io.undertow.servlet.api.SecurityInfo;
-import io.undertow.servlet.api.WebResourceCollection;
-import jakarta.servlet.ServletException;
 
 /**
  * Base class for the Http Suite Runners.

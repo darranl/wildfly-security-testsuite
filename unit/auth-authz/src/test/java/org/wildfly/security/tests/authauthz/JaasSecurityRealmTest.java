@@ -5,7 +5,6 @@
 
 package org.wildfly.security.tests.authauthz;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 

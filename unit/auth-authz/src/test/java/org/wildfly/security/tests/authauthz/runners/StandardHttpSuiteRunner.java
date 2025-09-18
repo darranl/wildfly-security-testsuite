@@ -6,12 +6,11 @@
 package org.wildfly.security.tests.authauthz.runners;
 
 
+import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
 import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
 import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
-import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
-import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.URI;
 import java.net.http.HttpClient;
