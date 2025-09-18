@@ -107,10 +107,9 @@ public class FileSystemSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
-        return Collections.emptySet();
-//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
-//                HttpAuthenticationMechanism.DIGEST_MD5,
-//                HttpAuthenticationMechanism.FORM,
-//                HttpAuthenticationMechanism.PROGRAMATIC);
+        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+                HttpAuthenticationMechanism.DIGEST_MD5,
+                HttpAuthenticationMechanism.FORM,
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }
