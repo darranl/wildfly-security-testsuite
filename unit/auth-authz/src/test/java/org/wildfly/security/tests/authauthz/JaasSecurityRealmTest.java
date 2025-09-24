@@ -5,7 +5,6 @@
 
 package org.wildfly.security.tests.authauthz;
 
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -50,20 +49,11 @@ public class JaasSecurityRealmTest extends AbstractAuthenticationSuite {
 
     static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {
         return EnumSet.of(SaslAuthenticationMechanism.PLAIN);
-//        return EnumSet.of(SaslAuthenticationMechanism.PLAIN,
-//                SaslAuthenticationMechanism.DIGEST_MD5,
-//                SaslAuthenticationMechanism.DIGEST_SHA_256,
-//                SaslAuthenticationMechanism.DIGEST_SHA_384,
-//                SaslAuthenticationMechanism.DIGEST_SHA,
-//                SaslAuthenticationMechanism.DIGEST_SHA_512_256,
-//                SaslAuthenticationMechanism.DIGEST_SHA_512);
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
-        return Collections.emptySet();
-//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
-//                HttpAuthenticationMechanism.DIGEST_MD5,
-//                HttpAuthenticationMechanism.FORM,
-//                HttpAuthenticationMechanism.PROGRAMATIC);
+        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+                HttpAuthenticationMechanism.FORM,
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }

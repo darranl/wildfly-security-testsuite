@@ -16,8 +16,8 @@ import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.stream.Stream;
-import org.junit.platform.suite.api.AfterSuite;
 
+import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.security.auth.principal.NamePrincipal;
 import org.wildfly.security.auth.realm.FileSystemSecurityRealm;
@@ -107,10 +107,9 @@ public class FileSystemSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
-        return Collections.emptySet();
-//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
-//                HttpAuthenticationMechanism.DIGEST_MD5,
-//                HttpAuthenticationMechanism.FORM,
-//                HttpAuthenticationMechanism.PROGRAMATIC);
+        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+                HttpAuthenticationMechanism.DIGEST_MD5,
+                HttpAuthenticationMechanism.FORM,
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }

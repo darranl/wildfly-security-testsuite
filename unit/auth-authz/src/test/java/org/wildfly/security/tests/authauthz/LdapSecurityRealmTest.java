@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
-import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -105,10 +104,9 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
-        return Collections.emptySet();
-//        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
-//                HttpAuthenticationMechanism.DIGEST_MD5,
-//                HttpAuthenticationMechanism.FORM,
-//                HttpAuthenticationMechanism.PROGRAMATIC);
+        return EnumSet.of(HttpAuthenticationMechanism.BASIC,
+                HttpAuthenticationMechanism.DIGEST_MD5,
+                HttpAuthenticationMechanism.FORM,
+                HttpAuthenticationMechanism.PROGRAMMATIC);
     }
 }

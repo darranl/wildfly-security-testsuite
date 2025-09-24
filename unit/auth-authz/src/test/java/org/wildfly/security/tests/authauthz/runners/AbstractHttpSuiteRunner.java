@@ -5,9 +5,10 @@
 
 package org.wildfly.security.tests.authauthz.runners;
 
+import static org.wildfly.security.auth.server.SecurityDomain.unregisterClassLoader;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createSecurityDomain;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.initialised;
+import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import jakarta.servlet.ServletException;
 import io.undertow.Handlers;
 import io.undertow.Undertow;
 import io.undertow.server.handlers.PathHandler;
@@ -26,6 +26,7 @@ import io.undertow.servlet.api.LoginConfig;
 import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.SecurityInfo;
 import io.undertow.servlet.api.WebResourceCollection;
+import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.wildfly.elytron.web.undertow.server.servlet.AuthenticationManager;
@@ -138,6 +139,7 @@ abstract class AbstractHttpSuiteRunner {
             undertowServer.stop();
             undertowServer = null;
         }
+        unregisterClassLoader(AbstractHttpSuiteRunner.class.getClassLoader());
     }
 
     /*
