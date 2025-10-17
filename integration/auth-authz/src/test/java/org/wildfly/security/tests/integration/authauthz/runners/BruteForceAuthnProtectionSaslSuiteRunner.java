@@ -146,12 +146,12 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
 
         @Override
         public void tearDown(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
-            super.tearDown(managementClient, s);
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", testRealmName)).assertSuccess();
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:remove", testRealmName)).assertSuccess();
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:remove", testRealmName)).assertSuccess();
             }
+            super.tearDown(managementClient, s);
         }
     }
 }
