@@ -68,6 +68,7 @@ abstract class AbstractSaslSuiteRunner {
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
             client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=sasl-auth-%s)", mechanism)).assertSuccess();
+            // TODO We should look at activating all mechanisms from the outset so we don't end up with a pre-mech server reload.
             new Administration(client).reloadIfRequired();
         }
     }
@@ -117,7 +118,7 @@ abstract class AbstractSaslSuiteRunner {
 
         @Override
         public void setup(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
-            
+
             testRealmName = AbstractAuthenticationSuite.getSecurityRealmSupplier().get();
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 for (SaslAuthenticationMechanism saslMech : AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms()) {
@@ -138,6 +139,7 @@ abstract class AbstractSaslSuiteRunner {
 
         @Override
         public void tearDown(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
+            // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=application-sasl-authentication)").assertSuccess();
