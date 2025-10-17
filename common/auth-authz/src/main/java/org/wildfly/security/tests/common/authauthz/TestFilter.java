@@ -22,9 +22,11 @@ public class TestFilter {
     private static final String TRANSPORT_TYPE_FILTER = "TestFilter.TransportType";
     private static final String HTTP_MECHANISM_FILTER = "TestFilter.HttpAuthenticationMechanism";
     private static final String SASL_MECHANISM_FILTER = "TestFilter.SaslAuthenticationMechanism";
+    private static final String TEST_FAMILY_FILTER = "TestFilter.TestFamily";
     private static final String TEST_NAME_FILTER = "TestFilter.TestName";
 
     private final Predicate<TransportType> transportTypePredicate;
+    private final Predicate<TestFamily> testFamilyPredicate;
     private final Predicate<String> testNamePredicate;
     private final Predicate<HttpAuthenticationMechanism> httpMechanismPredicate;
     private final Predicate<SaslAuthenticationMechanism> saslMechanismPredicate;
@@ -32,54 +34,38 @@ public class TestFilter {
     private static final TestFilter INSTANCE = new TestFilter();
 
     private TestFilter() {
-        String transportTypeFilter = System.getProperty(TRANSPORT_TYPE_FILTER, null);
-        if (transportTypeFilter != null) {
-            String[] transports = transportTypeFilter.split(",");
-            final Set<TransportType> enabledTransports = new HashSet<>(transports.length);
-            for (String currentTransport : transports) {
-                enabledTransports.add(TransportType.valueOf(currentTransport));
+        transportTypePredicate = createPredicate(TransportType.class, TRANSPORT_TYPE_FILTER);
+        testFamilyPredicate = createPredicate(TestFamily.class, TEST_FAMILY_FILTER);
+        testNamePredicate = createPredicate(TEST_NAME_FILTER);
+        httpMechanismPredicate = createPredicate(HttpAuthenticationMechanism.class, HTTP_MECHANISM_FILTER);
+        saslMechanismPredicate = createPredicate(SaslAuthenticationMechanism.class, SASL_MECHANISM_FILTER);
+    }
+
+    private static Predicate<String> createPredicate(final String systemProperty) {
+        String filter = System.getProperty(systemProperty, null);
+        if (filter != null) {
+            String[] testValues = filter.split(",");
+            final Set<String> enabledValues = new HashSet<>(testValues.length);
+            Collections.addAll(enabledValues, testValues);
+
+            return enabledValues::contains;
+        } else {
+            return n -> true;
+        }
+    }
+
+    private static <T extends Enum<T>> Predicate<T> createPredicate(Class<T> enumClass, String systemProperty) {
+        String filter = System.getProperty(systemProperty, null);
+        if (filter != null) {
+            String[] values = filter.split(",");
+            final Set<T> enabledValues = new HashSet<>(values.length);
+            for (String currentValue : values) {
+                enabledValues.add(T.valueOf(enumClass, currentValue));
             }
 
-            transportTypePredicate = enabledTransports::contains;
+            return enabledValues::contains;
         } else {
-            transportTypePredicate = t -> true;
-        }
-
-        String testNameFilter = System.getProperty(TEST_NAME_FILTER, null);
-        if (testNameFilter != null) {
-            String[] testNames = testNameFilter.split(",");
-            final Set<String> enabledTestNames = new HashSet<>(testNames.length);
-            Collections.addAll(enabledTestNames, testNames);
-
-            testNamePredicate = enabledTestNames::contains;
-        } else {
-            testNamePredicate = n -> true;
-        }
-
-        String httpMechanismFilter = System.getProperty(HTTP_MECHANISM_FILTER, null);
-        if (httpMechanismFilter != null) {
-            String[] mechanisms = httpMechanismFilter.split(",");
-            final Set<HttpAuthenticationMechanism> enabledMechanisms = new HashSet<>(mechanisms.length);
-            for (String currentMechanism : mechanisms) {
-                enabledMechanisms.add(HttpAuthenticationMechanism.valueOf(currentMechanism));
-            }
-
-            httpMechanismPredicate = enabledMechanisms::contains;
-        } else {
-            httpMechanismPredicate = m -> true;
-        }
-
-        String saslMechanismFilter = System.getProperty(SASL_MECHANISM_FILTER, null);
-        if (saslMechanismFilter != null) {
-            String[] mechanisms = saslMechanismFilter.split(",");
-            final Set<SaslAuthenticationMechanism> enabledMechanisms = new HashSet<>(mechanisms.length);
-            for (String currentMechanism : mechanisms) {
-                enabledMechanisms.add(SaslAuthenticationMechanism.valueOf(currentMechanism));
-            }
-
-            saslMechanismPredicate = enabledMechanisms::contains;
-        } else {
-            saslMechanismPredicate = m -> true;
+            return m -> true;
         }
     }
 
@@ -87,18 +73,20 @@ public class TestFilter {
         return INSTANCE;
     }
 
-    private boolean shouldRunTest(TransportType transport, String testName) {
-        return transportTypePredicate.test(transport) && testNamePredicate.test(testName);
+    private boolean shouldRunTest(TransportType transport, TestFamily family, String testName) {
+        return transportTypePredicate.test(transport) && testFamilyPredicate.test(family) && testNamePredicate.test(testName);
     }
 
-    public boolean shouldRunTest(HttpAuthenticationMechanism mechanism, String testName) {
-        return shouldRunTest(TransportType.HTTP, testName) && httpMechanismPredicate.test(mechanism);
+    public boolean shouldRunTest(HttpAuthenticationMechanism mechanism, TestFamily family, String testName) {
+        return shouldRunTest(TransportType.HTTP, family, testName) && httpMechanismPredicate.test(mechanism);
     }
 
-    public boolean shouldRunTest(SaslAuthenticationMechanism mechanism, String testName) {
-        return shouldRunTest(TransportType.SASL, testName) && saslMechanismPredicate.test(mechanism);
+    public boolean shouldRunTest(SaslAuthenticationMechanism mechanism, TestFamily family, String testName) {
+        return shouldRunTest(TransportType.SASL, family, testName) && saslMechanismPredicate.test(mechanism);
     }
 
+    // TODO This should probably be removed and combined with the others above i.e. the predicate here is more about
+    // the permutation.
     public boolean shouldRunTest(String testName) {
         return testNamePredicate.test(testName);
     }

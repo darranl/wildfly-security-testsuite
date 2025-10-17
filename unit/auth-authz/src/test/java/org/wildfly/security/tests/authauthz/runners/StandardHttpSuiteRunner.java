@@ -26,6 +26,7 @@ import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationUtility;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
 
 /**
@@ -59,18 +60,18 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
         String realmType = AbstractAuthenticationSuite.realmType();
         supportedMechnisms.forEach(s -> {
-            if (testFilter.shouldRunTest(s, "Success")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "Success")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testHttpSuccess(s)));
             }
 
-            if (testFilter.shouldRunTest(s, "BadUsername")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadUsername")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s),
                                 () -> testHttpBadUsername(s)));
             }
 
-            if (testFilter.shouldRunTest(s, "BadPassword")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadPassword")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s),
                                 () -> testHttpBadPassword(s)));

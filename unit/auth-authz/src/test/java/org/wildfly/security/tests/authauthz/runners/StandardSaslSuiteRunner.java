@@ -32,6 +32,7 @@ import org.wildfly.security.auth.client.MatchRule;
 import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.xnio.IoFuture;
 
@@ -60,18 +61,18 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
 
         String realmType = AbstractAuthenticationSuite.realmType();
         supportedMechnisms.forEach(s -> {
-            if (testFilter.shouldRunTest(s, "Success")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "Success")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslSuccess(%s)", realmType, s), () -> testSaslSuccess(s)));
             }
 
-            if (testFilter.shouldRunTest(s, "BadUsername")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadUsername")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBadUsername(%s)", realmType, s),
                                 () -> testSaslBadUsername(s)));
             }
 
-            if (testFilter.shouldRunTest(s, "BadPassword")) {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadPassword")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBadPassword(%s)", realmType, s),
                                 () -> testSaslBadPassword(s)));
