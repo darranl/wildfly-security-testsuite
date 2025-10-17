@@ -8,9 +8,11 @@ package org.wildfly.security.tests.integration.authauthz.runners;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.wildfly.security.tests.integration.authauthz.runners.DeploymentUtility.createJBossWebXml;
 
 import java.util.Hashtable;
 import java.util.concurrent.Callable;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -20,7 +22,6 @@ import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.wildfly.extras.creaper.core.ManagementClient;
@@ -33,9 +34,9 @@ import org.wildfly.security.auth.client.AuthenticationContext;
 import org.wildfly.security.auth.client.MatchRule;
 import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjb;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjbRemote;
-import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 
 @ArquillianTest
 @ServerSetup(AbstractSaslSuiteRunner.ConfigurationServerSetupTask.class)
@@ -108,10 +109,6 @@ abstract class AbstractSaslSuiteRunner {
                         "Exception '" + e.getMessage() + "' should contain message 'EJBCLIENT000409: No more destinations are available'");
             }
         }
-    }
-
-    public static StringAsset createJBossWebXml(String securityDomain) {
-        return new StringAsset(String.format("<jboss-web><security-domain>%s</security-domain></jboss-web>", securityDomain));
     }
 
     public static class ConfigurationServerSetupTask implements ServerSetupTask {

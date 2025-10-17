@@ -16,15 +16,16 @@ import org.junit.platform.suite.api.Suite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 import org.wildfly.security.tests.integration.authauthz.runners.BruteForceAuthnProtectionSaslSuiteRunner;
+import org.wildfly.security.tests.integration.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuiteRunner;
 
 /**
- *
+ * The base suite for authentication based testing.
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(value = { StandardSaslSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
+@SelectClasses(value = { StandardSaslSuiteRunner.class, StandardHttpSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
 
     private static volatile String realmType;
