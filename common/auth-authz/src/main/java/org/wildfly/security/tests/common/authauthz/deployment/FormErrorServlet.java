@@ -15,7 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 @SuppressWarnings("serial")
-@WebServlet("/errprForm")
+@WebServlet()
 public class FormErrorServlet extends HttpServlet {
 
     @Override
