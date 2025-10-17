@@ -19,7 +19,9 @@ import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
 import org.wildfly.extras.creaper.core.online.OnlineOptions;
 import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
+import org.wildfly.security.tests.common.authauthz.TransportType;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 
 @ServerSetup(BruteForceAuthnProtectionSaslSuiteRunner.ConfigurationServerSetupTask.class)
@@ -38,7 +40,7 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
 
         // tests per mechanism
         supportedMechnisms.forEach(s -> {
-            if (testFilter.shouldRunTest(s, "BruteForceAttemptsExceeded")) {
+            if (testFilter.shouldRunTest(s, TestFamily.BRUTE_FORCE, "BruteForceAttemptsExceeded")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceAttemptsExceeded(%s)", realmType, s),
                                 () -> testSaslBruteForceAttemptsExceeded(s)));
@@ -47,17 +49,17 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
 
         // tests per realm
         SaslAuthenticationMechanism mechanism = supportedMechnisms.iterator().next();
-        if (testFilter.shouldRunTest("BruteForceDisabled")) {
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "BruteForceDisabled")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceDisabled(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceDisabled(mechanism)));
         }
-        if (testFilter.shouldRunTest("testSaslBruteForceLockoutInterval")) {
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "testSaslBruteForceLockoutInterval")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceLockoutInterval(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceLockoutInterval(mechanism)));
         }
-        if (testFilter.shouldRunTest("testSaslBruteForceSessionTimeout")) {
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "testSaslBruteForceSessionTimeout")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceSessionTimeout(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceSessionTimeout(mechanism)));

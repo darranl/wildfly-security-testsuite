@@ -73,7 +73,7 @@ public class TestFilter {
         return INSTANCE;
     }
 
-    private boolean shouldRunTest(TransportType transport, TestFamily family, String testName) {
+    public boolean shouldRunTest(TransportType transport, TestFamily family, String testName) {
         return transportTypePredicate.test(transport) && testFamilyPredicate.test(family) && testNamePredicate.test(testName);
     }
 
@@ -83,11 +83,5 @@ public class TestFilter {
 
     public boolean shouldRunTest(SaslAuthenticationMechanism mechanism, TestFamily family, String testName) {
         return shouldRunTest(TransportType.SASL, family, testName) && saslMechanismPredicate.test(mechanism);
-    }
-
-    // TODO This should probably be removed and combined with the others above i.e. the predicate here is more about
-    // the permutation.
-    public boolean shouldRunTest(String testName) {
-        return testNamePredicate.test(testName);
     }
 }
