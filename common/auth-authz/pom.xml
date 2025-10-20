@@ -51,6 +51,21 @@
         <artifactId>jboss-ejb3-ext-api</artifactId>
         <scope>provided</scope>
     </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.common</groupId>
+      <artifactId>wildfly-common</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.wildfly.security</groupId>
+      <artifactId>wildfly-elytron-mechanism-digest</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
 </project>

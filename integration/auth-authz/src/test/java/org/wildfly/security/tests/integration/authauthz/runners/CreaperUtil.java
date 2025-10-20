@@ -16,9 +16,9 @@ import org.wildfly.extras.creaper.core.online.OnlineOptions;
  *
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
-class CreaperUtil {
+public class CreaperUtil {
 
-    static OnlineManagementClient onlineManagementClient() throws IOException {
+    public static OnlineManagementClient onlineManagementClient() throws IOException {
         return ManagementClient.online(OnlineOptions.standalone().localDefault().build());
     }
 

@@ -5,6 +5,8 @@
 
 package org.wildfly.security.tests.integration.authauthz;
 
+import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUtil.onlineManagementClient;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -14,11 +16,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.EnumSet;
 import java.util.Set;
+
 import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
-import org.wildfly.extras.creaper.core.ManagementClient;
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
-import org.wildfly.extras.creaper.core.online.OnlineOptions;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 
@@ -51,6 +52,8 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
         register(null, null, null, null);
     }
 
+    // TODO - Should we have a pair of methods we register that receive the already configured OnlineManagementClient
+    // to handle set up and clean up coordinated by the Suite.
     static String createSecurityRealm() {
         try (PrintStream out = new PrintStream(new FileOutputStream(REALM_USERS))) {
             obtainTestIdentities().forEach(identity -> {
@@ -68,7 +71,7 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
             throw new IllegalStateException("Creating roles properties file for properties security realm failed: " + ex.getMessage());
         }
 
-        try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
+        try (OnlineManagementClient client = onlineManagementClient()) {
             client.execute("/subsystem=elytron/properties-realm=test-properties-realm:add("
                     + "users-properties={path=test-realm-users.properties, plain-text=true, relative-to=jboss.server.config.dir}, "
                     + "groups-properties={path=test-realm-roles.properties, relative-to=jboss.server.config.dir})")

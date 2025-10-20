@@ -7,9 +7,9 @@ package org.wildfly.security.tests.authauthz.runners;
 
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyNoChallenge;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyPrincipal;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyStatusCode;
 
 import java.net.CookieManager;
 import java.net.URI;
@@ -24,10 +24,10 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
-import org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationUtility;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
+import org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationUtility;
 
 /**
  * A runner for standard HTTP authentication against the configured {@code SecurityRealm}.

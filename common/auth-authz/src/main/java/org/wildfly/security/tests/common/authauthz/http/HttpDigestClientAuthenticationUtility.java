@@ -3,18 +3,18 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz.framework;
+package org.wildfly.security.tests.common.authauthz.http;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.wildfly.security.mechanism.digest.DigestUtil.userRealmPasswordDigest;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.AUTHORIZATION;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyMechanismChallenge;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.AUTHORIZATION;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyMechanismChallenge;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyNoChallenge;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyPrincipal;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyStatusCode;
 
 import java.net.URI;
 import java.net.http.HttpRequest;
@@ -26,7 +26,6 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.apache.directory.api.util.Strings;
 import org.wildfly.common.iteration.ByteIterator;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 
@@ -92,7 +91,7 @@ public class HttpDigestClientAuthenticationUtility implements HttpClientAuthenti
             challengeData.putAll(processedData);
         }
 
-        if (!Strings.equals(challengeData.get(NONCE), currentNonce)) {
+        if (currentNonce == null || !currentNonce.equals(challengeData.get(NONCE))) {
             // New nonce so start counting again.
             currentNonce = challengeData.get(NONCE);
             nonceCount = 1;
