@@ -29,6 +29,8 @@ import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuit
 public abstract class AbstractAuthenticationSuite {
 
     private static volatile String realmType;
+    // TODO Presently we create the security realm as a side effect of calling get()
+    // Maybe we should make it more explicit.
     private static volatile Supplier<String> securityRealmSupplier;
     private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
     private static volatile Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms;

@@ -5,11 +5,14 @@
 
 package org.wildfly.security.tests.integration.authauthz.runners;
 
+import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUtil.onlineManagementClient;
 import static org.wildfly.security.tests.integration.authauthz.runners.DeploymentUtility.createJBossWebXml;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
+import org.jboss.as.arquillian.api.ServerSetupTask;
+import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.Asset;
 import org.jboss.shrinkwrap.api.asset.StringAsset;
@@ -17,7 +20,7 @@ import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor;
-import org.jboss.shrinkwrap.descriptor.api.webcommon31.ServletType;
+import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
@@ -37,12 +40,15 @@ abstract class AbstractHttpSuiteRunner {
     private static final String SECURED_PATH = "/secured";
     private static final String UNSECURED_PATH = "/unsecured";
 
+    // TODO How to avoid the static?
+    static String testRealmName;
+
     @Deployment(testable = false)
     public static EnterpriseArchive deployment() {
         EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "http-suite.ear");
         for (HttpAuthenticationMechanism httpMech : AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms()) {
             WebArchive war = ShrinkWrap.create(WebArchive.class, String.format("http-suite-%s.war", httpMech.getMechanismName()))
-                .addAsWebInfResource(createJBossWebXml(String.format("web-app-domain-%s", httpMech.getMechanismName())), "jboss-web.xml")
+                .addAsWebInfResource(createJBossWebXml("web-appp-domain"), "jboss-web.xml")
                 .addClasses(HelloWorldServlet.class, FormLoginServlet.class, FormErrorServlet.class)
                 .addAsWebInfResource(createWebXml(httpMech), "web.xml")
                 ;
@@ -104,4 +110,38 @@ abstract class AbstractHttpSuiteRunner {
         System.out.println(webXmlString);
         return new StringAsset(webXmlString);
     }
+
+    public static class ConfigurationServerSetupTask implements ServerSetupTask {
+
+        @Override
+        public void setup(ManagementClient managementClient, String containerId) throws Exception {
+            testRealmName = AbstractAuthenticationSuite.getSecurityRealmSupplier().get();
+            // To begin with we have no domain or application-security-domain specifics so use a
+            // single definition.
+            try (OnlineManagementClient client = onlineManagementClient()) {
+                client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-http:add("
+                            + "default-realm=%s, permission-mapper=default-permission-mapper, "
+                            + "realms=[{realm=%s, role-decoder=groups-to-roles}])",
+                            testRealmName, testRealmName)).assertSuccess();
+
+                client.execute(String.format("/subsystem=undertow/application-security-domain=%s:add(security-domain=%s)",
+                        "web-app-domain", "ely-domain-http")).assertSuccess();
+            }
+        }
+
+        @Override
+        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
+            // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
+            try (OnlineManagementClient client = onlineManagementClient()) {
+                    client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
+                    client.execute("/subsystem=elytron/security-domain=ely-domain-ely-domain-http:remove").assertSuccess();
+                // TODO - The realm should handle it's own clean up - it may have multiple resources.
+                client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
+            } finally {
+                testRealmName = null;
+            }
+        }
+
+    }
+
 }
