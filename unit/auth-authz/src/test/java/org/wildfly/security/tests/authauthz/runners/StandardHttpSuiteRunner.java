@@ -7,15 +7,7 @@ package org.wildfly.security.tests.authauthz.runners;
 
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
-import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyNoChallenge;
-import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyPrincipal;
-import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyStatusCode;
 
-import java.net.CookieManager;
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse.BodyHandlers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +19,7 @@ import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
-import org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationUtility;
+import org.wildfly.security.tests.common.authauthz.http.HttpTestClient;
 
 /**
  * A runner for standard HTTP authentication against the configured {@code SecurityRealm}.
@@ -38,12 +30,6 @@ import org.wildfly.security.tests.common.authauthz.http.HttpClientAuthentication
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
-
-    // TODO - Which of the following do we need to be dynamic based on the realm under test?
-    private final String goodUsername = "user1";
-    private final String goodPassword = "password1";
-    private final String badUsername = "bob";
-    private final String badPassword = "passwordx";
 
     @TestFactory
     Stream<DynamicTest> dynamicHttpTests() {
@@ -57,24 +43,27 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
                 AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms();
 
         TestFilter testFilter = TestFilter.getInstance();
+        HttpTestClient testClient = HttpTestClient.builder()
+                                        .withToUri(AbstractHttpSuiteRunner::toURI)
+                                        .build();
 
         String realmType = AbstractAuthenticationSuite.realmType();
         supportedMechnisms.forEach(s -> {
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "Success")) {
                 dynamicTests.add(
-                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testHttpSuccess(s)));
+                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testClient.testHttpSuccess(s)));
             }
 
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadUsername")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s),
-                                () -> testHttpBadUsername(s)));
+                                () -> testClient.testHttpBadUsername(s)));
             }
 
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadPassword")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s),
-                                () -> testHttpBadPassword(s)));
+                                () -> testClient.testHttpBadPassword(s)));
             }
         });
 
@@ -86,122 +75,5 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
         return dynamicTests.stream();
     }
 
-    private static HttpClient newHttpClient() {
-        // We create a new client for each test scenario for a clean cookie manager.
-        CookieManager cookieManager = new CookieManager();
-        return HttpClient.newBuilder()
-            .cookieHandler(cookieManager)
-            .followRedirects(HttpClient.Redirect.ALWAYS)
-            .build();
-    }
 
-    public void testHttpSuccess(final HttpAuthenticationMechanism mechanism) throws Exception {
-        System.out.println("~~ Set Up");
-        HttpClient httpClient = newHttpClient();
-
-        HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
-            .build();
-
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
-
-        // Test Requirements:
-        // - Response is HTTP 200
-        // - No challenge header
-        // - Principal is 'null'
-        System.out.println("~~ Insecure Request");
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(verifyStatusCode(200))
-            .thenApply(verifyNoChallenge())
-            .thenApply(verifyPrincipal(NULL))
-            .join();
-
-        // Call secured path and verify that the expected challenge was returned (as applicable)
-        System.out.println("~~ First Challenge");
-        URI securedResource = toURI(mechanism, true);
-        request = HttpRequest.newBuilder(securedResource).build();
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyChallenge())
-            .join();
-
-        // Generate a response to the challenge
-        System.out.println("~~ Respond to Challenge");
-        request = authUtility.createAuthenticationRequest(securedResource, goodUsername, goodPassword);
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyAuthentication(true))
-            .join();
-
-        // Call deployment again with the challenge and verify success.
-        System.out.println("~~ Second call");
-        request = authUtility.createRequest(securedResource);
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyAuthentication(true))
-            .join();
-    }
-
-    public void testHttpBadUsername(final HttpAuthenticationMechanism mechanism) throws Exception {
-        HttpClient httpClient = newHttpClient();
-
-        HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
-            .build();
-
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
-
-        // Test Requirements:
-        // - Response is HTTP 200
-        // - No challenge header
-        // - Principal is 'null'
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(verifyStatusCode(200))
-            .thenApply(verifyNoChallenge())
-            .thenApply(verifyPrincipal(NULL))
-            .join();
-
-        // Call secured path and verify that the expected challenge was returned (as applicable)
-        URI securedResource = toURI(mechanism, true);
-        request = HttpRequest.newBuilder(securedResource).build();
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyChallenge())
-            .join();
-
-        // Generate a response to the challenge
-        request = authUtility.createAuthenticationRequest(securedResource, badUsername, goodPassword);
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyAuthentication(false))
-            .join();
-    }
-
-    public void testHttpBadPassword(final HttpAuthenticationMechanism mechanism) throws Exception {
-        HttpClient httpClient = newHttpClient();
-
-        HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
-            .build();
-
-        // Call Unsecured Path to verify accessible
-        HttpRequest request = authUtility.createRequest(toURI(mechanism, false));
-
-        // Test Requirements:
-        // - Response is HTTP 200
-        // - No challenge header
-        // - Principal is 'null'
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(verifyStatusCode(200))
-            .thenApply(verifyNoChallenge())
-            .thenApply(verifyPrincipal(NULL))
-            .join();
-
-        // Call secured path and verify that the expected challenge was returned (as applicable)
-        URI securedResource = toURI(mechanism, true);
-        request = HttpRequest.newBuilder(securedResource).build();
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyChallenge())
-            .join();
-
-        // Generate a response to the challenge
-        request = authUtility.createAuthenticationRequest(securedResource, goodUsername, badPassword);
-        httpClient.sendAsync(request, BodyHandlers.ofString())
-            .thenApply(authUtility.verifyAuthentication(false))
-            .join();
-    }
 }
