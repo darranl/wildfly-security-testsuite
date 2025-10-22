@@ -8,6 +8,9 @@ package org.wildfly.security.tests.integration.authauthz.runners;
 import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUtil.onlineManagementClient;
 import static org.wildfly.security.tests.integration.authauthz.runners.DeploymentUtility.createJBossWebXml;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
@@ -22,6 +25,7 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.descriptor.api.Descriptors;
 import org.jboss.shrinkwrap.descriptor.api.webapp31.WebAppDescriptor;
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
+import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
@@ -38,18 +42,41 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 @RunAsClient
 abstract class AbstractHttpSuiteRunner {
 
+    // TODO Can we discover / inject these?
+    private static final String HTTP_HOSTNAME = System.getProperty("http.hostname", "localhost");
+    private static final int HTTP_PORT = Integer.getInteger("http.port", 8080);
+
+    private static final String DEPLOYMENT_NAME_TEMPLATE = "http-suite-%s.war";
+    private static final String CONTEXT_ROOT_PATH_TEMPLATE = "/http-suite-%s";
     private static final String SECURED_PATH = "/secured";
     private static final String UNSECURED_PATH = "/unsecured";
 
     // TODO How to avoid the static?
     static String testRealmName;
 
+    /*
+     * Public Utility Methods
+     */
+
+    public static String toDeploymentName(final HttpAuthenticationMechanism mechanism) {
+        return String.format(DEPLOYMENT_NAME_TEMPLATE, mechanism.name());
+    }
+
+    public static String toContextRoot(final HttpAuthenticationMechanism mechanism) {
+        return String.format(CONTEXT_ROOT_PATH_TEMPLATE, mechanism.name());
+    }
+
+    public static URI toURI(final HttpAuthenticationMechanism mechanism, final boolean secured) throws URISyntaxException {
+        return new URI("http", null, HTTP_HOSTNAME, HTTP_PORT,
+         toContextRoot(mechanism) + (secured ? SECURED_PATH : UNSECURED_PATH), null, null);
+    }
+
     @Deployment(testable = false)
     public static EnterpriseArchive deployment() {
         EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "http-suite.ear");
         for (HttpAuthenticationMechanism httpMech : AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms()) {
             WebArchive war = ShrinkWrap.create(WebArchive.class, String.format("http-suite-%s.war", httpMech.getMechanismName()))
-                .addAsWebInfResource(createJBossWebXml("web-appp-domain"), "jboss-web.xml")
+                .addAsWebInfResource(createJBossWebXml("web-app-domain"), "jboss-web.xml")
                 .addClasses(HelloWorldServlet.class, FormLoginServlet.class, FormErrorServlet.class)
                 .addAsWebInfResource(createWebXml(httpMech), "web.xml")
                 ;
@@ -127,6 +154,11 @@ abstract class AbstractHttpSuiteRunner {
 
                 client.execute(String.format("/subsystem=undertow/application-security-domain=%s:add(security-domain=%s)",
                         "web-app-domain", "ely-domain-http")).assertSuccess();
+
+                client.execute("/subsystem=logging/logger=org.wildfly.security:add(level=TRACE)").assertSuccess();
+                client.execute("/subsystem=logging/logger=io.undertow:add(level=TRACE)").assertSuccess();
+
+                new Administration(client).reload();
             }
         }
 
@@ -134,6 +166,9 @@ abstract class AbstractHttpSuiteRunner {
         public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             try (OnlineManagementClient client = onlineManagementClient()) {
+                client.execute("/subsystem=logging/logger=io.undertow:remove").assertSuccess();
+                client.execute("/subsystem=logging/logger=org.wildfly.security:remove").assertSuccess();
+
                 client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
                 client.execute("/subsystem=elytron/security-domain=ely-domain-http:remove").assertSuccess();
                 // TODO - The realm should handle it's own clean up - it may have multiple resources.

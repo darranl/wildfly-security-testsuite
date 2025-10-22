@@ -58,10 +58,6 @@ abstract class AbstractHttpSuiteRunner {
     private static final String HTTP_HOSTNAME = System.getProperty("http.hostname", "localhost");
     private static final int HTTP_PORT = Integer.getInteger("http.port", 8080);
 
-    static final String ANONYMOUS = "anonymous";
-    static final String NULL = "null";
-    static final int HTTP_OK = 200;
-
     private static final String DEPLOYMENT_NAME_TEMPLATE = "%sDeployment.war";
     private static final String CONTEXT_ROOT_PATH_TEMPLATE = "/hello%s";
     private static final String SECURED_PATH = "/secured";

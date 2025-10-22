@@ -15,7 +15,9 @@ import java.util.stream.Stream;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
+import org.wildfly.security.tests.common.authauthz.http.HttpTestClient;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 
 /**
@@ -26,7 +28,7 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
     @TestFactory
-    Stream<DynamicTest> dynamicSaslTests() {
+    Stream<DynamicTest> dynamicHttpTests() {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
         Set<HttpAuthenticationMechanism> supportedMechnisms =
@@ -34,9 +36,27 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
         TestFilter testFilter = TestFilter.getInstance();
         String realmType = AbstractAuthenticationSuite.realmType();
+        HttpTestClient testClient = HttpTestClient.builder()
+                                        .withToUri(AbstractHttpSuiteRunner::toURI)
+                                        .build();
 
         supportedMechnisms.forEach(s -> {
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "Success")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testClient.testHttpSuccess(s)));
+            }
 
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadUsername")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpBadUsername(%s)", realmType, s),
+                                () -> testClient.testHttpBadUsername(s)));
+            }
+
+            if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadPassword")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s),
+                                () -> testClient.testHttpBadPassword(s)));
+            }
         });
 
         if (dynamicTests.isEmpty()) {
