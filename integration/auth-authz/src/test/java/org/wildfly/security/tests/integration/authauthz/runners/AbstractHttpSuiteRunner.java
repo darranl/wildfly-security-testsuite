@@ -11,6 +11,7 @@ import static org.wildfly.security.tests.integration.authauthz.runners.Deploymen
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -33,7 +34,7 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @ArquillianTest
-// TODO Add @ServerSetup
+@ServerSetup(AbstractHttpSuiteRunner.ConfigurationServerSetupTask.class)
 @RunAsClient
 abstract class AbstractHttpSuiteRunner {
 
@@ -133,8 +134,8 @@ abstract class AbstractHttpSuiteRunner {
         public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             try (OnlineManagementClient client = onlineManagementClient()) {
-                    client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
-                    client.execute("/subsystem=elytron/security-domain=ely-domain-ely-domain-http:remove").assertSuccess();
+                client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
+                client.execute("/subsystem=elytron/security-domain=ely-domain-http:remove").assertSuccess();
                 // TODO - The realm should handle it's own clean up - it may have multiple resources.
                 client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
             } finally {
