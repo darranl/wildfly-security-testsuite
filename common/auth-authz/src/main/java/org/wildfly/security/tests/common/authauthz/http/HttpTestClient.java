@@ -14,6 +14,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.util.function.BiFunction;
 
@@ -48,6 +49,7 @@ public class HttpTestClient {
         return HttpClient.newBuilder()
             .cookieHandler(cookieManager)
             .followRedirects(HttpClient.Redirect.ALWAYS)
+            .version(Version.HTTP_1_1) // Make Network Traces Easier To Read
             .build();
     }
 

@@ -58,12 +58,8 @@ abstract class AbstractHttpSuiteRunner {
      * Public Utility Methods
      */
 
-    public static String toDeploymentName(final HttpAuthenticationMechanism mechanism) {
-        return String.format(DEPLOYMENT_NAME_TEMPLATE, mechanism.name());
-    }
-
     public static String toContextRoot(final HttpAuthenticationMechanism mechanism) {
-        return String.format(CONTEXT_ROOT_PATH_TEMPLATE, mechanism.name());
+        return String.format(CONTEXT_ROOT_PATH_TEMPLATE, mechanism.getMechanismName());
     }
 
     public static URI toURI(final HttpAuthenticationMechanism mechanism, final boolean secured) throws URISyntaxException {
@@ -75,7 +71,7 @@ abstract class AbstractHttpSuiteRunner {
     public static EnterpriseArchive deployment() {
         EnterpriseArchive ear = ShrinkWrap.create(EnterpriseArchive.class, "http-suite.ear");
         for (HttpAuthenticationMechanism httpMech : AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms()) {
-            WebArchive war = ShrinkWrap.create(WebArchive.class, String.format("http-suite-%s.war", httpMech.getMechanismName()))
+            WebArchive war = ShrinkWrap.create(WebArchive.class, String.format(DEPLOYMENT_NAME_TEMPLATE, httpMech.getMechanismName()))
                 .addAsWebInfResource(createJBossWebXml("web-app-domain"), "jboss-web.xml")
                 .addClasses(HelloWorldServlet.class, FormLoginServlet.class, FormErrorServlet.class)
                 .addAsWebInfResource(createWebXml(httpMech), "web.xml")
