@@ -107,6 +107,9 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
     private void performSaslTest(final String mechanism, final String userName,
                                  final String password, final boolean expectSuccess) throws IOException {
 
+        if (!isStarted()) {
+            throw new IllegalStateException("Not Fully Started.");
+        }
         AuthenticationContext authContext = AuthenticationContext.empty()
                 .with(MatchRule.ALL, AuthenticationConfiguration.empty()
                         .useName(userName)

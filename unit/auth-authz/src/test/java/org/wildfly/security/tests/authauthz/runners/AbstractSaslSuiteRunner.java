@@ -72,10 +72,15 @@ abstract class AbstractSaslSuiteRunner {
         final SSLContext serverContext = SSLContext.getDefault();
         streamServer = networkServerProvider.createServer(new InetSocketAddress("localhost", 30123),
                 optionMap, saslAuthenticationFactory, serverContext);
+        System.out.println("AbstractSaslSuiteRunner->startServer() - COMPLETE");
     }
 
     protected Endpoint getEndpoint() {
         return endpoint;
+    }
+
+    protected boolean isStarted() {
+        return streamServer != null;
     }
 
     @AfterEach
