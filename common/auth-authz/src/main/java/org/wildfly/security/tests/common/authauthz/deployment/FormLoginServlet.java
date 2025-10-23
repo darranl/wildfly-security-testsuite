@@ -20,7 +20,7 @@ import jakarta.servlet.http.HttpServletResponse;
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @SuppressWarnings("serial")
-@WebServlet("/loginForm")
+@WebServlet()
 public class FormLoginServlet extends HttpServlet {
 
     @Override

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz.framework;
+package org.wildfly.security.tests.common.authauthz.http;
 
 import java.net.URI;
 import java.net.http.HttpRequest;

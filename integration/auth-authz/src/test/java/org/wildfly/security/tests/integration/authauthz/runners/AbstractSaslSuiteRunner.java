@@ -8,9 +8,12 @@ package org.wildfly.security.tests.integration.authauthz.runners;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUtil.onlineManagementClient;
+import static org.wildfly.security.tests.integration.authauthz.runners.DeploymentUtility.createJBossWebXml;
 
 import java.util.Hashtable;
 import java.util.concurrent.Callable;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -19,13 +22,11 @@ import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit5.container.annotation.ArquillianTest;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
+import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.StringAsset;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.wildfly.extras.creaper.core.ManagementClient;
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
-import org.wildfly.extras.creaper.core.online.OnlineOptions;
 import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 import org.wildfly.naming.client.WildFlyInitialContextFactory;
 import org.wildfly.security.auth.client.AuthenticationConfiguration;
@@ -33,9 +34,9 @@ import org.wildfly.security.auth.client.AuthenticationContext;
 import org.wildfly.security.auth.client.MatchRule;
 import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjb;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjbRemote;
-import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
 
 @ArquillianTest
 @ServerSetup(AbstractSaslSuiteRunner.ConfigurationServerSetupTask.class)
@@ -65,9 +66,10 @@ abstract class AbstractSaslSuiteRunner {
     }
 
     static void configureHttpConnectorSaslAuthn(final String mechanism) throws Exception {
-        try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
+        try (OnlineManagementClient client = onlineManagementClient()) {
             client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=sasl-auth-%s)", mechanism)).assertSuccess();
+            // TODO We should look at activating all mechanisms from the outset so we don't end up with a pre-mech server reload.
             new Administration(client).reloadIfRequired();
         }
     }
@@ -109,19 +111,16 @@ abstract class AbstractSaslSuiteRunner {
         }
     }
 
-    public static StringAsset createJBossWebXml(String securityDomain) {
-        return new StringAsset(String.format("<jboss-web><security-domain>%s</security-domain></jboss-web>", securityDomain));
-    }
-
     public static class ConfigurationServerSetupTask implements ServerSetupTask {
 
         @Override
-        public void setup(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
-            
+        public void setup(ManagementClient managementClient, String s) throws Exception {
+
             testRealmName = AbstractAuthenticationSuite.getSecurityRealmSupplier().get();
-            try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
+            try (OnlineManagementClient client = onlineManagementClient()) {
                 for (SaslAuthenticationMechanism saslMech : AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms()) {
                     String saslMechName = saslMech.getMechanismName();
+                    // TODO We probably don't need a domain per mech as we only have a single realm.
                     client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-%s:add("
                             + "default-realm=%s, permission-mapper=default-permission-mapper, "
                             + "realms=[{realm=%s, role-decoder=groups-to-roles}])",
@@ -137,8 +136,9 @@ abstract class AbstractSaslSuiteRunner {
         }
 
         @Override
-        public void tearDown(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
-            try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
+        public void tearDown(ManagementClient managementClient, String s) throws Exception {
+            // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
+            try (OnlineManagementClient client = onlineManagementClient()) {
                 client.execute("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=application-sasl-authentication)").assertSuccess();
 

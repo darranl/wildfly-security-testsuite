@@ -57,6 +57,11 @@
       <artifactId>arquillian-junit5-container</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+        <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+        <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+        <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.junit.platform</groupId>

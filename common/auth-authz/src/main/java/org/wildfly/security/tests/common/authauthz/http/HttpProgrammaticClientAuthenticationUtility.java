@@ -3,12 +3,12 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz.framework;
+package org.wildfly.security.tests.common.authauthz.http;
 
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyMechanismChallenge;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyNoChallenge;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyPrincipal;
-import static org.wildfly.security.tests.authauthz.framework.HttpClientAuthenticationCommon.verifyStatusCode;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyMechanismChallenge;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyNoChallenge;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyPrincipal;
+import static org.wildfly.security.tests.common.authauthz.http.HttpClientAuthenticationCommon.verifyStatusCode;
 import static org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet.X_PASSWORD;
 import static org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet.X_USERNAME;
 
