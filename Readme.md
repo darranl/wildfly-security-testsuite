@@ -14,7 +14,7 @@ or the behaviour of the tests themselves.
 
 The following properties can be set to control the HTTP unit tests.
 
-- `http.hostnane` (Default: "localhost") - The host name to bind the HTTP server to.
+- `http.hostname` (Default: "localhost") - The host name to bind the HTTP server to.
 - `http.port` (Default: "8080") - The base port number the HTTP server will listen on.
 
 ## Running Individual Tests
