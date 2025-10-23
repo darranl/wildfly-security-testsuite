@@ -118,7 +118,7 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
 
         IoFuture<Connection> futureConnection = authContext.run(
                 (PrivilegedAction<IoFuture<Connection>>) () ->
-                        endpoint.connect(toUri("remote://localhost:30123"),
+                        endpoint.connect(toUri(getUri()),
                                 optionMap)
         );
 

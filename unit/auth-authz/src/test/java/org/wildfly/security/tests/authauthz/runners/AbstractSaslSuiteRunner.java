@@ -41,8 +41,14 @@ abstract class AbstractSaslSuiteRunner {
 
     static final OptionMap optionMap = OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE);
 
+    private int port = 30123;
+
     private Endpoint endpoint;
     private Closeable streamServer;
+
+    String getUri() {
+        return String.format("remote://localhost:%d", port);
+    }
 
     @BeforeEach
     public void startServer() throws Exception {
@@ -70,7 +76,7 @@ abstract class AbstractSaslSuiteRunner {
                 .build();
 
         final SSLContext serverContext = SSLContext.getDefault();
-        streamServer = networkServerProvider.createServer(new InetSocketAddress("localhost", 30123),
+        streamServer = networkServerProvider.createServer(new InetSocketAddress("localhost", ++port),
                 optionMap, saslAuthenticationFactory, serverContext);
     }
 
