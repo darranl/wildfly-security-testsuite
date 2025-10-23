@@ -27,8 +27,8 @@ import io.undertow.servlet.api.SecurityConstraint;
 import io.undertow.servlet.api.SecurityInfo;
 import io.undertow.servlet.api.WebResourceCollection;
 import jakarta.servlet.ServletException;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.wildfly.elytron.web.undertow.server.servlet.AuthenticationManager;
 import org.wildfly.security.auth.server.HttpAuthenticationFactory;
 import org.wildfly.security.auth.server.MechanismConfiguration;
@@ -67,7 +67,7 @@ abstract class AbstractHttpSuiteRunner {
     private static final String SECURED_PATH = "/secured";
     private static final String UNSECURED_PATH = "/unsecured";
 
-    private Undertow undertowServer;
+    private static Undertow undertowServer;
 
     /*
      * Public Utility Methods
@@ -89,8 +89,8 @@ abstract class AbstractHttpSuiteRunner {
     /**
      * Set up the server process to be used by the tests.
      */
-    @BeforeEach
-    public void startServer() {
+    @BeforeAll
+    public static void startServer() {
         System.out.println("AbstractHttpSuiteRunner->startServer()");
         if (!initialised()) {
             System.out.println("AbstractHttpSuiteRunner - NOT INITIALISED");
@@ -132,8 +132,8 @@ abstract class AbstractHttpSuiteRunner {
     /**
      * Stop the server process previously started for testing.
      */
-    @AfterEach
-    public void stopServer() {
+    @AfterAll
+    public static void stopServer() {
         System.out.println("AbstractHttpSuiteRunner->stopServer()");
         if (undertowServer != null) {
             undertowServer.stop();

@@ -20,8 +20,8 @@ import javax.security.sasl.SaslServerFactory;
 
 import org.jboss.remoting3.Endpoint;
 import org.jboss.remoting3.spi.NetworkServerProvider;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.wildfly.security.auth.server.MechanismConfiguration;
 import org.wildfly.security.auth.server.SaslAuthenticationFactory;
 import org.wildfly.security.sasl.util.ServiceLoaderSaslServerFactory;
@@ -41,11 +41,11 @@ abstract class AbstractSaslSuiteRunner {
 
     static final OptionMap optionMap = OptionMap.create(Options.SSL_ENABLED, Boolean.FALSE);
 
-    private Endpoint endpoint;
-    private Closeable streamServer;
+    private static Endpoint endpoint;
+    private static Closeable streamServer;
 
-    @BeforeEach
-    public void startServer() throws Exception {
+    @BeforeAll
+    public static void startServer() throws Exception {
         System.out.println("AbstractSaslSuiteRunner->startServer()");
         if (!initialised()) {
             System.out.println("AbstractSaslSuiteRunner - NOT INITIALISED");
@@ -78,8 +78,8 @@ abstract class AbstractSaslSuiteRunner {
         return endpoint;
     }
 
-    @AfterEach
-    public void stopServer() throws IOException {
+    @AfterAll
+    public static void stopServer() throws IOException {
         // TODO Make Safe for close();
         if (streamServer != null) {
             streamServer.close();
