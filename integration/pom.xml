@@ -36,7 +36,7 @@
     <wildfly.home>${project.build.directory}/server</wildfly.home>
     <!-- Version Properties-->
     <version.org.apache.maven.plugins.maven-antrun-plugin>3.1.0</version.org.apache.maven.plugins.maven-antrun-plugin>
-    <version.org.jboss.arquillian>1.9.5.Final</version.org.jboss.arquillian>
+    <version.org.jboss.arquillian>1.10.0.Final</version.org.jboss.arquillian>
     <version.org.jboss.shrinkwrap.descriptors>2.0.0</version.org.jboss.shrinkwrap.descriptors>
     <version.org.wildfly.arquillian>5.1.0.Final</version.org.wildfly.arquillian>
     <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
