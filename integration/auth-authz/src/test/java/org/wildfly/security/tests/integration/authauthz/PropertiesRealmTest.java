@@ -5,8 +5,6 @@
 
 package org.wildfly.security.tests.integration.authauthz;
 
-import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUtil.onlineManagementClient;
-
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -19,6 +17,7 @@ import java.util.Set;
 
 import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
+import org.wildfly.extras.creaper.core.online.CliException;
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
@@ -28,14 +27,20 @@ import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
  */
 public class PropertiesRealmTest extends AbstractAuthenticationSuite {
 
+    private static final String REALM_NAME = "test-properties-realm";
+    private static final String REALM_TYPE = "properties-realm";
+
     private static final Path SERVER_CONFIG_DIR = Paths.get(System.getProperty("jboss.home")).toAbsolutePath()
             .resolve("standalone").resolve("configuration");
     private static final File REALM_USERS = SERVER_CONFIG_DIR.resolve("test-realm-users.properties").toFile();
     private static final File REALM_ROLES = SERVER_CONFIG_DIR.resolve("test-realm-roles.properties").toFile();
 
+    private volatile static boolean realmRegistered = true;
+
     @BeforeSuite
     public static void beginRealm() {
-        register("properties-realm", PropertiesRealmTest::createSecurityRealm,
+        register(SecurityRealmRegistrar.create(() -> REALM_TYPE, () -> REALM_NAME,
+                                            PropertiesRealmTest::registerSecurityRealm, PropertiesRealmTest::removeSecurityRealm),
                 PropertiesRealmTest::realmHttpMechanisms,
                 PropertiesRealmTest::realmSaslMechanisms);
     }
@@ -49,12 +54,10 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
             REALM_ROLES.delete();
         }
 
-        register(null, null, null, null);
+        register(null, null, null);
     }
 
-    // TODO - Should we have a pair of methods we register that receive the already configured OnlineManagementClient
-    // to handle set up and clean up coordinated by the Suite.
-    static String createSecurityRealm() {
+    static void registerSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try (PrintStream out = new PrintStream(new FileOutputStream(REALM_USERS))) {
             obtainTestIdentities().forEach(identity -> {
                 out.println(String.format("%s=%s", identity.username(), identity.password()));
@@ -71,15 +74,28 @@ public class PropertiesRealmTest extends AbstractAuthenticationSuite {
             throw new IllegalStateException("Creating roles properties file for properties security realm failed: " + ex.getMessage());
         }
 
-        try (OnlineManagementClient client = onlineManagementClient()) {
-            client.execute("/subsystem=elytron/properties-realm=test-properties-realm:add("
+        try {
+            managementClient.execute("/subsystem=elytron/properties-realm=test-properties-realm:add("
                     + "users-properties={path=test-realm-users.properties, plain-text=true, relative-to=jboss.server.config.dir}, "
                     + "groups-properties={path=test-realm-roles.properties, relative-to=jboss.server.config.dir})")
                     .assertSuccess();
-        } catch (Exception ex) {
-            throw new IllegalStateException("Creating properties security realm failed: " + ex.getMessage());
+            realmRegistered = true;
+        } catch (CliException e) {
+            throw new IOException("Unable to register security realm configuration.", e);
         }
-        return "test-properties-realm";
+
+    }
+
+    static void removeSecurityRealm(OnlineManagementClient managementClient) throws IOException {
+        try {
+            if (realmRegistered) {
+                managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
+                    REALM_TYPE, REALM_NAME)).assertSuccess();
+                realmRegistered = false;
+            }
+        } catch (CliException e) {
+            throw new IOException("Unable to remove security realm configuration.", e);
+        }
     }
 
     static Set<SaslAuthenticationMechanism> realmSaslMechanisms() {

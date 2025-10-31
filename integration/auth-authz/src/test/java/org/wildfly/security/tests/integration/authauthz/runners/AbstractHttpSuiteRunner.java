@@ -31,6 +31,7 @@ import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.HelloWorldServlet;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.SecurityRealmRegistrar;
 
 /**
  * The base "runner" to set up HTTP authentication based testing.
@@ -50,9 +51,6 @@ abstract class AbstractHttpSuiteRunner {
     private static final String CONTEXT_ROOT_PATH_TEMPLATE = "/http-suite-%s";
     private static final String SECURED_PATH = "/secured";
     private static final String UNSECURED_PATH = "/unsecured";
-
-    // TODO How to avoid the static?
-    static String testRealmName;
 
     /*
      * Public Utility Methods
@@ -139,10 +137,12 @@ abstract class AbstractHttpSuiteRunner {
 
         @Override
         public void setup(ManagementClient managementClient, String containerId) throws Exception {
-            testRealmName = AbstractAuthenticationSuite.getSecurityRealmSupplier().get();
+            SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             // To begin with we have no domain or application-security-domain specifics so use a
             // single definition.
             try (OnlineManagementClient client = onlineManagementClient()) {
+                securityRealmRegistrar.register(client);
+                String testRealmName = securityRealmRegistrar.getRealmName();
                 client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-http:add("
                             + "default-realm=%s, permission-mapper=default-permission-mapper, "
                             + "realms=[{realm=%s, role-decoder=groups-to-roles}])",
@@ -160,6 +160,7 @@ abstract class AbstractHttpSuiteRunner {
 
         @Override
         public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
+            SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             try (OnlineManagementClient client = onlineManagementClient()) {
                 client.execute("/subsystem=logging/logger=io.undertow:remove").assertSuccess();
@@ -167,10 +168,7 @@ abstract class AbstractHttpSuiteRunner {
 
                 client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
                 client.execute("/subsystem=elytron/security-domain=ely-domain-http:remove").assertSuccess();
-                // TODO - The realm should handle it's own clean up - it may have multiple resources.
-                client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
-            } finally {
-                testRealmName = null;
+                securityRealmRegistrar.unRegister(client);
             }
         }
 

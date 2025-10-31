@@ -35,6 +35,7 @@ import org.wildfly.security.auth.client.MatchRule;
 import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.SecurityRealmRegistrar;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjb;
 import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjbRemote;
 
@@ -42,8 +43,6 @@ import org.wildfly.security.tests.integration.authauthz.deployment.SecuredEjbRem
 @ServerSetup(AbstractSaslSuiteRunner.ConfigurationServerSetupTask.class)
 @RunAsClient
 abstract class AbstractSaslSuiteRunner {
-
-    static String testRealmName;
 
     @Deployment(testable = false)
     public static EnterpriseArchive deployment() {
@@ -116,8 +115,10 @@ abstract class AbstractSaslSuiteRunner {
         @Override
         public void setup(ManagementClient managementClient, String s) throws Exception {
 
-            testRealmName = AbstractAuthenticationSuite.getSecurityRealmSupplier().get();
+            SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             try (OnlineManagementClient client = onlineManagementClient()) {
+                securityRealmRegistrar.register(client);
+                String testRealmName = securityRealmRegistrar.getRealmName();
                 for (SaslAuthenticationMechanism saslMech : AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms()) {
                     String saslMechName = saslMech.getMechanismName();
                     // TODO We probably don't need a domain per mech as we only have a single realm.
@@ -138,6 +139,7 @@ abstract class AbstractSaslSuiteRunner {
         @Override
         public void tearDown(ManagementClient managementClient, String s) throws Exception {
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
+            SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             try (OnlineManagementClient client = onlineManagementClient()) {
                 client.execute("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=application-sasl-authentication)").assertSuccess();
@@ -148,9 +150,7 @@ abstract class AbstractSaslSuiteRunner {
                     client.execute(String.format("/subsystem=elytron/sasl-authentication-factory=sasl-auth-%s:remove", saslMechName)).assertSuccess();
                     client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-%s:remove", saslMechName)).assertSuccess();
                 }
-                client.execute(String.format("/subsystem=elytron/%s=%s:remove", AbstractAuthenticationSuite.realmType(), testRealmName)).assertSuccess();
-            } finally {
-                testRealmName = null;
+                securityRealmRegistrar.unRegister(client);
             }
         }
     }
