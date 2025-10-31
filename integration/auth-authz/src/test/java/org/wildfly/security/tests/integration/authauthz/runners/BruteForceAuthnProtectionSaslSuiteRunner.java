@@ -27,7 +27,11 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 @ServerSetup(BruteForceAuthnProtectionSaslSuiteRunner.ConfigurationServerSetupTask.class)
 public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteRunner {
 
-    @TestFactory
+    static String realmName() {
+        return AbstractAuthenticationSuite.getSecurityRealmRegistrar().getRealmName();
+    }
+
+     @TestFactory
     Stream<DynamicTest> dynamicSaslTests() {
         List<DynamicTest> dynamicTests = new ArrayList<>();
 
@@ -115,7 +119,7 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
             client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=sasl-auth-%s)", mechanism.getMechanismName())).assertSuccess();
-            client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", testRealmName)).assertSuccess();
+            client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", realmName())).assertSuccess();
             new Administration(client).reload();
         }
 
@@ -125,7 +129,7 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
             testSaslEjbConnection(mechanism.getMechanismName(), "user5", "password5", true);
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", testRealmName)).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();
                 new Administration(client).reload();
             }
         }
@@ -137,9 +141,9 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         public void setup(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
             super.setup(managementClient, s);
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=1)", testRealmName)).assertSuccess();
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:add(value=1)", testRealmName)).assertSuccess();
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:add(value=1)", testRealmName)).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=1)", realmName())).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:add(value=1)", realmName())).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:add(value=1)", realmName())).assertSuccess();
                 new Administration(client).reload();
             }
         }
@@ -147,9 +151,9 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         @Override
         public void tearDown(org.jboss.as.arquillian.container.ManagementClient managementClient, String s) throws Exception {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", testRealmName)).assertSuccess();
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:remove", testRealmName)).assertSuccess();
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:remove", testRealmName)).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", realmName())).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:remove", realmName())).assertSuccess();
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:remove", realmName())).assertSuccess();
             }
             super.tearDown(managementClient, s);
         }

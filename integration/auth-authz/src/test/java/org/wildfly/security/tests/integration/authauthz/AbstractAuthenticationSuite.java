@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
+
 import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
@@ -28,31 +29,27 @@ import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuit
 @SelectClasses(value = { StandardSaslSuiteRunner.class, StandardHttpSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
 
-    private static volatile String realmType;
-    // TODO Presently we create the security realm as a side effect of calling get()
-    // Maybe we should make it more explicit.
-    private static volatile Supplier<String> securityRealmSupplier;
+    private static volatile SecurityRealmRegistrar securityRealmRegistrar;
     private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
     private static volatile Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms;
 
     /*
      * New Registration Methods
      */
-    public static void register(String realmType, Supplier<String> securityRealmSupplier,
+    public static void register(SecurityRealmRegistrar securityRealmRegistrar,
             Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms,
             Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms) {
-        AbstractAuthenticationSuite.realmType = realmType;
-        AbstractAuthenticationSuite.securityRealmSupplier = securityRealmSupplier;
+        AbstractAuthenticationSuite.securityRealmRegistrar = securityRealmRegistrar;
         AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms = supportedHttpAuthenticationMechanisms;
         AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms = supportedSaslAuthenticationMechanisms;
     }
 
     public static String realmType() {
-        return realmType;
+        return securityRealmRegistrar.getRealmType();
     }
 
-    public static Supplier<String> getSecurityRealmSupplier() {
-        return securityRealmSupplier;
+    public static SecurityRealmRegistrar getSecurityRealmRegistrar() {
+        return securityRealmRegistrar;
     }
 
     public static Set<HttpAuthenticationMechanism> supportedHttpAuthenticationMechanisms() {
