@@ -5,6 +5,8 @@
 
 package org.wildfly.security.tests.integration.authauthz;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -28,6 +30,9 @@ import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuit
 @Suite
 @SelectClasses(value = { StandardSaslSuiteRunner.class, StandardHttpSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
+
+    protected static final Path SERVER_CONFIG_DIR = Paths.get(System.getProperty("jboss.home")).toAbsolutePath()
+            .resolve("standalone").resolve("configuration");
 
     private static volatile SecurityRealmRegistrar securityRealmRegistrar;
     private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
