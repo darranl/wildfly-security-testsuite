@@ -103,8 +103,9 @@
             </feature-packs>
             <layers>
               <layer>core-server</layer>
-              <layer>web-server</layer>
+              <layer>datasources-web-server</layer>
               <layer>ejb</layer>
+              <layer>h2-driver</layer>
             </layers>
             <galleon-options>
               <jboss-maven-dist />

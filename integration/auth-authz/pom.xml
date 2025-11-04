@@ -51,6 +51,11 @@
       <artifactId>httpclient5</artifactId>
     </dependency>
 
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
     <!-- Test Framework Dependencies-->
     <dependency>
       <groupId>org.jboss.arquillian.junit5</groupId>
