@@ -14,7 +14,6 @@ import org.junit.platform.suite.api.AfterSuite;
 import org.junit.platform.suite.api.BeforeSuite;
 import org.wildfly.extras.creaper.core.online.CliException;
 import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
-import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 

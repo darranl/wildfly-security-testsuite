@@ -115,7 +115,7 @@ abstract class AbstractHttpSuiteRunner {
                 .urlPattern(SECURED_PATH + "/*")
                 .up()
             .getOrCreateAuthConstraint()
-                .roleName("**");
+                .roleName("admin");
 
         // LoginConfig
         String mechanismName = authenticationMechanism.getMechanismName();

@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz;
+package org.wildfly.security.tests.common.authauthz.ldap;
 
 import java.io.Closeable;
 import java.io.File;
@@ -163,6 +163,16 @@ public class LdapService implements Closeable {
             ldif.close();
 
             return this;
+        }
+
+        /**
+         * Import an LDIF by name.
+         *
+         * @param ldifName - The name of the LDIF to load.
+         * @return This Builder for subsequent changes.
+         */
+        public Builder importLdif(String ldifName) throws Exception {
+            return this.importLdif(LdapService.class.getResourceAsStream(ldifName));
         }
 
         /**
