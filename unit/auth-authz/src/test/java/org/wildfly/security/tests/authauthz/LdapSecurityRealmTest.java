@@ -88,7 +88,7 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
                 .setWorkingDir(LDAP_DIR.toFile())
                 .createDirectoryService(LdapSecurityRealmTest.class.getSimpleName())
                 .addPartition("Elytron", "dc=security,dc=wildfly,dc=org", 5, "uid")
-                .importLdif(LdapSecurityRealmTest.class.getResourceAsStream("ldap-security-realm-test.ldif"))
+                .importLdif("ldap-security-realm-test.ldif")
                 .importLdif(new ByteArrayInputStream(identitiesString.toString().getBytes()))
                 .addTcpServer("Default TCP", "localhost", LDAP_PORT)
                 .start();

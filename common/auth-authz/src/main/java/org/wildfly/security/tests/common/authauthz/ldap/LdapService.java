@@ -166,6 +166,16 @@ public class LdapService implements Closeable {
         }
 
         /**
+         * Import an LDIF by name.
+         *
+         * @param ldifName - The name of the LDIF to load.
+         * @return This Builder for subsequent changes.
+         */
+        public Builder importLdif(String ldifName) throws Exception {
+            return this.importLdif(LdapService.class.getResourceAsStream(ldifName));
+        }
+
+        /**
          * Adds a TCP server to the directory service. SSL/TLS is not enabled.
          *
          * Note: The TCP server is not started until start() is called on this Builder.
