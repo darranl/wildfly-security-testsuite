@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-package org.wildfly.security.tests.authauthz;
+package org.wildfly.security.tests.common.authauthz.ldap;
 
 import java.io.Closeable;
 import java.io.File;

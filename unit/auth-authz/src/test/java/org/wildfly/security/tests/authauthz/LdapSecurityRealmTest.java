@@ -21,6 +21,7 @@ import org.wildfly.security.auth.realm.ldap.SimpleDirContextFactoryBuilder;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.ldap.LdapService;
 
 /**
  * A {@code Suite} instance for testing against a {@code SecurityRealm} backed by an LDAP.
