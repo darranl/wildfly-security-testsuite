@@ -53,6 +53,7 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
         // Stop any server processes created for the realm either in-vm or test containers.
         // Clean up any filesystem resources for this realm.
         ldapService.close();
+        ldapService = null;
 
         // This impl was in memory so garbage collection is sufficient.
         register(null, null, null, null);
