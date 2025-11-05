@@ -161,6 +161,9 @@
             <systemPropertyVariables>
               <jboss.home>${wildfly.home}</jboss.home>
             </systemPropertyVariables>
+            <environmentVariables>
+                <JBOSS_HOME>${wildfly.home}</JBOSS_HOME>
+            </environmentVariables>
           </configuration>
         </plugin>
       </plugins>
