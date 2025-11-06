@@ -133,6 +133,8 @@ abstract class AbstractSaslSuiteRunner {
                     client.execute(String.format("/subsystem=ejb3/application-security-domain=ejb-app-domain-%s:add(security-domain=ely-domain-%s)",
                             saslMechName, saslMechName)).assertSuccess();
                 }
+
+                client.execute("/subsystem=logging/logger=org.wildfly.security:add(level=TRACE)").assertSuccess();
             }
         }
 
@@ -141,6 +143,8 @@ abstract class AbstractSaslSuiteRunner {
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             try (OnlineManagementClient client = onlineManagementClient()) {
+                client.execute("/subsystem=logging/logger=org.wildfly.security:remove").assertSuccess();
+
                 client.execute("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                     + "name=sasl-authentication-factory, value=application-sasl-authentication)").assertSuccess();
 
