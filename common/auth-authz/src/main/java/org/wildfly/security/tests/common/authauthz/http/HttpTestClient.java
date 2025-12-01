@@ -54,6 +54,12 @@ public class HttpTestClient {
     }
 
     public void testHttpSuccess(final HttpAuthenticationMechanism mechanism) throws Exception {
+        testHttpSuccess(mechanism, goodUsername, goodPassword);
+    }
+
+    public void testHttpSuccess(final HttpAuthenticationMechanism mechanism, final String username, final String password)
+            throws Exception {
+
         System.out.println("~~ Set Up");
         HttpClient httpClient = newHttpClient();
 
@@ -84,7 +90,7 @@ public class HttpTestClient {
 
         // Generate a response to the challenge
         System.out.println("~~ Respond to Challenge");
-        request = authUtility.createAuthenticationRequest(securedResource, goodUsername, goodPassword);
+        request = authUtility.createAuthenticationRequest(securedResource, username, password);
         httpClient.sendAsync(request, BodyHandlers.ofString())
             .thenApply(authUtility.verifyAuthentication(true))
             .join();
@@ -131,6 +137,12 @@ public class HttpTestClient {
     }
 
     public void testHttpBadPassword(final HttpAuthenticationMechanism mechanism) throws Exception {
+        testHttpBadPassword(mechanism, goodUsername, badPassword);
+    }
+
+    public void testHttpBadPassword(final HttpAuthenticationMechanism mechanism, final String username, final String password)
+            throws Exception {
+
         HttpClient httpClient = newHttpClient();
 
         HttpClientAuthenticationUtility authUtility = HttpClientAuthenticationUtility.builder(mechanism)
@@ -157,7 +169,7 @@ public class HttpTestClient {
             .join();
 
         // Generate a response to the challenge
-        request = authUtility.createAuthenticationRequest(securedResource, goodUsername, badPassword);
+        request = authUtility.createAuthenticationRequest(securedResource, username, password);
         httpClient.sendAsync(request, BodyHandlers.ofString())
             .thenApply(authUtility.verifyAuthentication(false))
             .join();

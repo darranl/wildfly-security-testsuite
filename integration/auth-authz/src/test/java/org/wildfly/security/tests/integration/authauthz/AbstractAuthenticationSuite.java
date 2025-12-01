@@ -18,6 +18,7 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.integration.authauthz.runners.BruteForceAuthnProtectionHttpSuiteRunner;
 import org.wildfly.security.tests.integration.authauthz.runners.BruteForceAuthnProtectionSaslSuiteRunner;
 import org.wildfly.security.tests.integration.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuiteRunner;
@@ -28,7 +29,8 @@ import org.wildfly.security.tests.integration.authauthz.runners.StandardSaslSuit
  * @author <a href="mailto:darran.lofthouse@jboss.com">Darran Lofthouse</a>
  */
 @Suite
-@SelectClasses(value = { StandardSaslSuiteRunner.class, StandardHttpSuiteRunner.class, BruteForceAuthnProtectionSaslSuiteRunner.class })
+@SelectClasses(value = { StandardSaslSuiteRunner.class, StandardHttpSuiteRunner.class,
+        BruteForceAuthnProtectionSaslSuiteRunner.class, BruteForceAuthnProtectionHttpSuiteRunner.class })
 public abstract class AbstractAuthenticationSuite {
 
     protected static final Path SERVER_CONFIG_DIR = Paths.get(System.getProperty("jboss.home")).toAbsolutePath()
