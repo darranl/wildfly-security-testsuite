@@ -21,6 +21,7 @@ import org.wildfly.security.auth.realm.ldap.SimpleDirContextFactoryBuilder;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
+import org.wildfly.security.tests.common.authauthz.ldap.LdapService;
 
 /**
  * A {@code Suite} instance for testing against a {@code SecurityRealm} backed by an LDAP.
@@ -52,6 +53,7 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
         // Stop any server processes created for the realm either in-vm or test containers.
         // Clean up any filesystem resources for this realm.
         ldapService.close();
+        ldapService = null;
 
         // This impl was in memory so garbage collection is sufficient.
         register(null, null, null, null);
@@ -87,7 +89,7 @@ public class LdapSecurityRealmTest extends AbstractAuthenticationSuite {
                 .setWorkingDir(LDAP_DIR.toFile())
                 .createDirectoryService(LdapSecurityRealmTest.class.getSimpleName())
                 .addPartition("Elytron", "dc=security,dc=wildfly,dc=org", 5, "uid")
-                .importLdif(LdapSecurityRealmTest.class.getResourceAsStream("ldap-security-realm-test.ldif"))
+                .importLdif("ldap-security-realm-test.ldif")
                 .importLdif(new ByteArrayInputStream(identitiesString.toString().getBytes()))
                 .addTcpServer("Default TCP", "localhost", LDAP_PORT)
                 .start();

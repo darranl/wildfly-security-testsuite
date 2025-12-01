@@ -39,6 +39,9 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
 
+    <version.org.apache.directory.api>2.1.7</version.org.apache.directory.api>
+    <version.org.apache.directory.jdbm>2.0.0-M3</version.org.apache.directory.jdbm>
+    <version.org.apache.directory.server>2.0.0.AM27</version.org.apache.directory.server>
     <version.org.apache.httpclient>5.5</version.org.apache.httpclient>
     <version.org.apache.httpcomponents>4.4.16</version.org.apache.httpcomponents>
     <version.com.h2database.h2>2.4.240</version.com.h2database.h2>
@@ -77,6 +80,58 @@
         <scope>import</scope>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.directory.api</groupId>
+        <artifactId>api-ldap-codec-standalone</artifactId>
+        <version>${version.org.apache.directory.api}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.api</groupId>
+        <artifactId>api-ldap-extras-codec-api</artifactId>
+        <version>${version.org.apache.directory.api}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.api</groupId>
+        <artifactId>api-ldap-model</artifactId>
+        <version>${version.org.apache.directory.api}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.jdbm</groupId>
+        <artifactId>apacheds-jdbm1</artifactId>
+        <type>jar</type>
+        <version>${version.org.apache.directory.jdbm}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-core-annotations</artifactId>
+        <version>${version.org.apache.directory.server}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.directory.jdbm</groupId>
+            <artifactId>apacheds-jdbm1</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-core-api</artifactId>
+        <version>${version.org.apache.directory.server}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.directory.server</groupId>
+        <artifactId>apacheds-protocol-ldap</artifactId>
+        <version>${version.org.apache.directory.server}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.directory.jdbm</groupId>
+            <artifactId>apacheds-jdbm1</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.bouncycastle</groupId>
+            <artifactId>bcprov-jdk15on</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
       <dependency>
         <groupId>org.apache.httpcomponents.client5</groupId>
         <artifactId>httpclient5</artifactId>
