@@ -45,6 +45,22 @@
   <dependencies>
     <!-- Testsuite Module Dependencies -->
     <dependency>
+      <groupId>io.smallrye.common</groupId>
+      <artifactId>smallrye-common-cpu</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.common</groupId>
+      <artifactId>smallrye-common-net</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>io.smallrye.common</groupId>
+      <artifactId>smallrye-common-os</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>io.undertow</groupId>
       <artifactId>undertow-core</artifactId>
       <scope>test</scope>
