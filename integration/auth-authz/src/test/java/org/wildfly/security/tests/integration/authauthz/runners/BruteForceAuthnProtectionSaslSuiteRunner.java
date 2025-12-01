@@ -79,54 +79,49 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
 
     public void testSaslBruteForceAttemptsExceeded(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceAttemptsExceeded(%s)\n", mechanism);
-        configureHttpConnectorSaslAuthn(mechanism.getMechanismName());
 
-        testSaslEjbConnection(mechanism.getMechanismName(), "user1", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user1", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user1", "password1", false);
+        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user1", "password1", false);
 
         // TODO investigate why this does not work
         //testSaslEjbConnection(mechanism.getMechanismName(), "user2", "password2", true);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user2", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user2", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user2", "password2", false);
+        performSaslTest(mechanism.getMechanismName(), "user2", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user2", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user2", "password2", false);
     }
 
     // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short lockout interval for tests (1 minute now).
     public void testSaslBruteForceLockoutInterval(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceLockoutInterval(%s)\n", mechanism);
 
-        configureHttpConnectorSaslAuthn(mechanism.getMechanismName());
-        testSaslEjbConnection(mechanism.getMechanismName(), "user3", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user3", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user3", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user3", "passwordX", false);
         Thread.sleep(61000);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user3", "password3", true);
+        performSaslTest(mechanism.getMechanismName(), "user3", "password3", true);
     }
 
     // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short session timout for tests (1 minute now).
     public void testSaslBruteForceSessionTimeout(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceSessionTimeout(%s)\n", mechanism);
 
-        configureHttpConnectorSaslAuthn(mechanism.getMechanismName());
-        testSaslEjbConnection(mechanism.getMechanismName(), "user4", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
         Thread.sleep(61000);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user4", "passwordX", false);
-        testSaslEjbConnection(mechanism.getMechanismName(), "user4", "password4", true);
+        performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), "user4", "password4", true);
     }
 
     public void testSaslBruteForceDisabled(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceDisabled(%s)\n", mechanism);
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-            client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
-                    + "name=sasl-authentication-factory, value=sasl-auth-%s)", mechanism.getMechanismName())).assertSuccess();
             client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", realmName())).assertSuccess();
             new Administration(client).reload();
         }
 
         try {
-            testSaslEjbConnection(mechanism.getMechanismName(), "user5", "passwordX", false);
-            testSaslEjbConnection(mechanism.getMechanismName(), "user5", "passwordX", false);
-            testSaslEjbConnection(mechanism.getMechanismName(), "user5", "password5", true);
+            performSaslTest(mechanism.getMechanismName(), "user5", "passwordX", false);
+            performSaslTest(mechanism.getMechanismName(), "user5", "passwordX", false);
+            performSaslTest(mechanism.getMechanismName(), "user5", "password5", true);
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();
