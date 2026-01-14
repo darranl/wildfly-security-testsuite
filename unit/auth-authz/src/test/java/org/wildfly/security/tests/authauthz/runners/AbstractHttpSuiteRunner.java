@@ -6,7 +6,6 @@
 package org.wildfly.security.tests.authauthz.runners;
 
 import static org.wildfly.security.auth.server.SecurityDomain.unregisterClassLoader;
-import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.createSecurityDomain;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.initialised;
 import static org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms;
 
@@ -41,6 +40,7 @@ import org.wildfly.security.http.digest.DigestMechanismFactory;
 import org.wildfly.security.http.form.FormMechanismFactory;
 import org.wildfly.security.http.util.AggregateServerMechanismFactory;
 import org.wildfly.security.http.util.FilterServerMechanismFactory;
+import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.deployment.FormErrorServlet;
 import org.wildfly.security.tests.common.authauthz.deployment.FormLoginServlet;
@@ -141,6 +141,17 @@ abstract class AbstractHttpSuiteRunner {
     /*
      * Our Utility Methods
      */
+
+    /**
+     * Create the {@code SecurityDomain} used for testing.
+     *
+     * This method is not static so the runners can optionally override it.
+     *
+     * @return the {@code SecurityDomain} used for testing.
+     */
+    protected SecurityDomain createSecurityDomain() {
+        return AbstractAuthenticationSuite.createSecurityDomain();
+    }
 
     /**
      * Create a {@code HttpServerAuthenticationMechanismFactory} that supports the specified mechanisms.

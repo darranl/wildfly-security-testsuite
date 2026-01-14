@@ -28,6 +28,7 @@ import org.wildfly.security.auth.realm.BruteForceRealmWrapper;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
+import org.wildfly.security.tests.authauthz.runners.BruteForceAuthnProtectionHttpSuiteRunner;
 import org.wildfly.security.tests.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.authauthz.runners.StandardSaslSuiteRunner;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
@@ -42,7 +43,8 @@ import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 @Suite
 @SelectClasses(value = {
         StandardHttpSuiteRunner.class,
-        StandardSaslSuiteRunner.class
+        StandardSaslSuiteRunner.class,
+        BruteForceAuthnProtectionHttpSuiteRunner.class
 })
 public abstract class AbstractAuthenticationSuite {
 
