@@ -33,7 +33,7 @@
 
   <properties>
     <version.io.smallrye.smallrye-common>2.14.0</version.io.smallrye.smallrye-common>
-    <version.io.undertow>2.3.20.Final</version.io.undertow>
+    <version.io.undertow>2.3.21.Final</version.io.undertow>
     <version.jakarta.annotation.jakarta-annotation-api>3.0.0</version.jakarta.annotation.jakarta-annotation-api>
     <version.jakarta.authentication.jakarta.authentication-api>2.0.0</version.jakarta.authentication.jakarta.authentication-api>
     <version.jakarta.ejb.jakarta-ejb-api>4.0.1</version.jakarta.ejb.jakarta-ejb-api>
