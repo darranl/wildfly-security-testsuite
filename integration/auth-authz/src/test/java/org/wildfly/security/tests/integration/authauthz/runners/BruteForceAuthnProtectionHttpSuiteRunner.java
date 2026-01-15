@@ -119,7 +119,8 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
         try {
             testClient.testHttpBadPassword(mechanism, "user5", "passwordX");
             testClient.testHttpBadPassword(mechanism, "user5", "passwordX");
-            testClient.testHttpBadPassword(mechanism, "user5", "password5");
+            // This next call should succeed as brute force protection is disabled.
+            testClient.testHttpSuccess(mechanism, "user5", "password5");
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();
