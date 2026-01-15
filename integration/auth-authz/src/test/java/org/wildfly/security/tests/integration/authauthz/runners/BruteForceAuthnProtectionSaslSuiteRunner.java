@@ -108,7 +108,7 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         System.out.printf("testSaslBruteForceSessionTimeout(%s)\n", mechanism);
 
         performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
-        Thread.sleep(61000);
+        Thread.sleep(121000);
         performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), "user4", "password4", true);
     }
@@ -137,9 +137,9 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         @Override
         protected Map<String, String> getRequiredSystemProperties() {
             Map<String, String> properties = new HashMap<>();
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "2");
             properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName()), "1");
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "2");
             return properties;
         }
 
