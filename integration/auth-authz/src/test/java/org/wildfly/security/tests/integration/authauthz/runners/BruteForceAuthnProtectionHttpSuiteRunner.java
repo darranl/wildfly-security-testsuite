@@ -106,7 +106,7 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
 
     public void testHttpBruteForceSessionTimeout(final HttpAuthenticationMechanism mechanism) throws Exception {
         testClient.testHttpBadPassword(mechanism, "user4", "passwordX");
-        Thread.sleep(61000);
+        Thread.sleep(121000);
         testClient.testHttpBadPassword(mechanism, "user4", "passwordX");
         testClient.testHttpSuccess(mechanism, "user4", "password4");
     }
@@ -133,9 +133,9 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
         @Override
         protected Map<String, String> getRequiredSystemProperties() {
             Map<String, String> properties = new HashMap<>();
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "2");
             properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName()), "1");
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "2");
             return properties;
         }
 
