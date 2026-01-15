@@ -8,10 +8,13 @@ package org.wildfly.security.tests.integration.authauthz.runners;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import org.jboss.as.arquillian.api.ServerSetup;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
 import org.wildfly.extras.creaper.core.ManagementClient;
@@ -28,6 +31,7 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 /**
  * Runner for brute force attack protection HTTP mechanism testing.
  */
+@ServerSetup(BruteForceAuthnProtectionHttpSuiteRunner.ConfigurationServerSetupTask.class)
 public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
     HttpTestClient testClient = HttpTestClient.builder()
@@ -122,5 +126,17 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
                 new Administration(client).reload();
             }
         }
+    }
+    public static class ConfigurationServerSetupTask extends AbstractHttpSuiteRunner.ConfigurationServerSetupTask {
+
+        @Override
+        protected Map<String, String> getRequiredSystemProperties() {
+            Map<String, String> properties = new HashMap<>();
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName()), "1");
+            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "1");
+            return properties;
+        }
+
     }
 }

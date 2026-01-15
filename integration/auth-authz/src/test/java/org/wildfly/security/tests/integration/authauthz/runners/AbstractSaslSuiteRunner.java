@@ -12,8 +12,12 @@ import static org.wildfly.security.tests.integration.authauthz.runners.CreaperUt
 import static org.wildfly.security.tests.integration.authauthz.runners.DeploymentUtility.createJBossWebXml;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import javax.naming.Context;
@@ -121,6 +125,11 @@ abstract class AbstractSaslSuiteRunner {
                         testRealmName, testRealmName)).assertSuccess();
                 client.execute(String.format("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
                         + "name=sasl-authentication-factory, value=sasl-auth-%s)", testRealmName)).assertSuccess();
+
+                for (Entry<String, String> entry : getRequiredSystemProperties().entrySet()) {
+                    client.execute(String.format("/system-property=%s:add(value=%s)", entry.getKey(), entry.getValue())).assertSuccess();
+                }
+
                 new Administration(client).reloadIfRequired();
             }
         }
@@ -131,6 +140,10 @@ abstract class AbstractSaslSuiteRunner {
             SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             String testRealmName = securityRealmRegistrar.getRealmName();
             try (OnlineManagementClient client = onlineManagementClient()) {
+                for (String key : getRequiredSystemProperties().keySet()) {
+                    client.execute(String.format("/system-property=%s:remove", key)).assertSuccess();
+                }
+
                 client.execute("/subsystem=logging/logger=org.wildfly.security:remove").assertSuccess();
 
                 client.execute("/subsystem=remoting/http-connector=http-remoting-connector:write-attribute("
@@ -142,6 +155,10 @@ abstract class AbstractSaslSuiteRunner {
                 securityRealmRegistrar.unRegister(client);
                 new Administration(client).reloadIfRequired();
             }
+        }
+
+        protected Map<String, String> getRequiredSystemProperties() {
+            return Collections.emptyMap();
         }
     }
 }

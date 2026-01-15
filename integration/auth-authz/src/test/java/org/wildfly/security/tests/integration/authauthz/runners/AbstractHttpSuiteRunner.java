@@ -10,6 +10,9 @@ import static org.wildfly.security.tests.integration.authauthz.runners.Deploymen
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.RunAsClient;
@@ -152,7 +155,12 @@ abstract class AbstractHttpSuiteRunner {
                         "web-app-domain", "ely-domain-http")).assertSuccess();
 
                 client.execute("/subsystem=logging/logger=org.wildfly.security:add(level=TRACE)").assertSuccess();
+                client.execute("/subsystem=logging/logger=org.wildfly.extension.elytron:add(level=TRACE)").assertSuccess();
                 client.execute("/subsystem=logging/logger=io.undertow:add(level=TRACE)").assertSuccess();
+
+                for (Entry<String, String> entry : getRequiredSystemProperties().entrySet()) {
+                    client.execute(String.format("/system-property=%s:add(value=%s)", entry.getKey(), entry.getValue())).assertSuccess();
+                }
 
                 new Administration(client).reload();
             }
@@ -163,13 +171,22 @@ abstract class AbstractHttpSuiteRunner {
             SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             try (OnlineManagementClient client = onlineManagementClient()) {
+                for (String key : getRequiredSystemProperties().keySet()) {
+                    client.execute(String.format("/system-property=%s:remove", key)).assertSuccess();
+                }
+
                 client.execute("/subsystem=logging/logger=io.undertow:remove").assertSuccess();
+                client.execute("/subsystem=logging/logger=org.wildfly.extension.elytron:remove").assertSuccess();
                 client.execute("/subsystem=logging/logger=org.wildfly.security:remove").assertSuccess();
 
                 client.execute("/subsystem=undertow/application-security-domain=web-app-domain:remove").assertSuccess();
                 client.execute("/subsystem=elytron/security-domain=ely-domain-http:remove").assertSuccess();
                 securityRealmRegistrar.unRegister(client);
             }
+        }
+
+        protected Map<String, String> getRequiredSystemProperties() {
+            return Collections.emptyMap();
         }
 
     }
