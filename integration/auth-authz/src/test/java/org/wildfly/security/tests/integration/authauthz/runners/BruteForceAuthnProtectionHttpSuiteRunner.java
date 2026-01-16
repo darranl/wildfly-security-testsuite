@@ -6,6 +6,7 @@
 package org.wildfly.security.tests.integration.authauthz.runners;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.nextIdentity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,6 +28,7 @@ import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.wildfly.security.tests.common.authauthz.TransportType;
 import org.wildfly.security.tests.common.authauthz.http.HttpTestClient;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.IdentityDefinition;
 
 /**
  * Runner for brute force attack protection HTTP mechanism testing.
@@ -87,28 +89,32 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
     }
 
     public void testHttpBruteForceAttemptsExceeded(final HttpAuthenticationMechanism mechanism) throws Exception {
-        testClient.testHttpBadPassword(mechanism, "user1", "passwordX");
-        testClient.testHttpBadPassword(mechanism, "user1", "passwordX");
-        testClient.testHttpBadPassword(mechanism, "user1", "password1");
+        IdentityDefinition identityOne = nextIdentity();
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), identityOne.password());
 
-        testClient.testHttpSuccess(mechanism, "user2", "password2");
-        testClient.testHttpBadPassword(mechanism, "user2", "passwordX");
-        testClient.testHttpBadPassword(mechanism, "user2", "passwordX");
-        testClient.testHttpBadPassword(mechanism, "user2", "password2");
+        IdentityDefinition identityTwo = nextIdentity();
+        testClient.testHttpSuccess(mechanism, identityTwo.username(), identityTwo.password());
+        testClient.testHttpBadPassword(mechanism, identityTwo.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityTwo.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityTwo.username(), identityTwo.password());
     }
 
     public void testHttpBruteForceLockoutInterval(final HttpAuthenticationMechanism mechanism) throws Exception {
-        testClient.testHttpBadPassword(mechanism, "user3", "passwordX");
-        testClient.testHttpBadPassword(mechanism, "user3", "passwordX");
+        IdentityDefinition identityOne = nextIdentity();
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
         Thread.sleep(61000);
-        testClient.testHttpSuccess(mechanism, "user3", "password3");
+        testClient.testHttpSuccess(mechanism, identityOne.username(), identityOne.password());
     }
 
     public void testHttpBruteForceSessionTimeout(final HttpAuthenticationMechanism mechanism) throws Exception {
-        testClient.testHttpBadPassword(mechanism, "user4", "passwordX");
+        IdentityDefinition identityOne = nextIdentity();
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
         Thread.sleep(121000);
-        testClient.testHttpBadPassword(mechanism, "user4", "passwordX");
-        testClient.testHttpSuccess(mechanism, "user4", "password4");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpSuccess(mechanism, identityOne.username(), identityOne.password());
     }
 
     public void testHttpBruteForceDisabled(final HttpAuthenticationMechanism mechanism) throws Exception {
@@ -117,10 +123,11 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
             new Administration(client).reload();
         }
         try {
-            testClient.testHttpBadPassword(mechanism, "user5", "passwordX");
-            testClient.testHttpBadPassword(mechanism, "user5", "passwordX");
+            IdentityDefinition identityOne = nextIdentity();
+            testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+            testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
             // This next call should succeed as brute force protection is disabled.
-            testClient.testHttpSuccess(mechanism, "user5", "password5");
+            testClient.testHttpSuccess(mechanism, identityOne.username(), identityOne.password());
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();

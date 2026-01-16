@@ -6,6 +6,7 @@
 package org.wildfly.security.tests.integration.authauthz.runners;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.nextIdentity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.wildfly.security.tests.common.authauthz.http.HttpTestClient;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.IdentityDefinition;
 
 /**
  * Runner for standard HTTP mechanism testing.
@@ -42,8 +44,9 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
 
         supportedMechnisms.forEach(s -> {
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "Success")) {
+                final IdentityDefinition identityOne = nextIdentity();
                 dynamicTests.add(
-                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testClient.testHttpSuccess(s)));
+                        dynamicTest(String.format("[%s] testHttpSuccess(%s)", realmType, s), () -> testClient.testHttpSuccess(s, identityOne.username(), identityOne.password())));
             }
 
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadUsername")) {
@@ -53,9 +56,10 @@ public class StandardHttpSuiteRunner extends AbstractHttpSuiteRunner {
             }
 
             if (testFilter.shouldRunTest(s, TestFamily.STANDARD, "BadPassword")) {
+                final IdentityDefinition identityOne = nextIdentity();
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testHttpBadPassword(%s)", realmType, s),
-                                () -> testClient.testHttpBadPassword(s)));
+                                () -> testClient.testHttpBadPassword(s, identityOne.username(), "passwordx")));
             }
         });
 

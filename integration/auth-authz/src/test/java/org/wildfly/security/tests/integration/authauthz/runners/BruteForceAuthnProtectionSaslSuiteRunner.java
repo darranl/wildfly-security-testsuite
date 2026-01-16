@@ -6,6 +6,7 @@
 package org.wildfly.security.tests.integration.authauthz.runners;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.nextIdentity;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,7 @@ import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.wildfly.security.tests.common.authauthz.TransportType;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.IdentityDefinition;
 
 @ServerSetup(BruteForceAuthnProtectionSaslSuiteRunner.ConfigurationServerSetupTask.class)
 public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteRunner {
@@ -82,35 +84,44 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
     public void testSaslBruteForceAttemptsExceeded(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceAttemptsExceeded(%s)\n", mechanism);
 
-        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user1", "password1", false);
+        /*
+         * We can not start these tests with a good scenario if we want to verify the last call is rejected,
+         * otherwise the connection from the first call is cached and re-used for the last call.
+         */
 
-        // TODO investigate why this does not work
-        //testSaslEjbConnection(mechanism.getMechanismName(), "user2", "password2", true);
-        performSaslTest(mechanism.getMechanismName(), "user2", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user2", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user2", "password2", false);
+        //performSaslTest(mechanism.getMechanismName(), "user1", "password1", true);
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), false);
+
+        //performSaslTest(mechanism.getMechanismName(), "user2", "password2", true);
+        IdentityDefinition identityTwo = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityTwo.username(), identityTwo.password(), false);
     }
 
     // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short lockout interval for tests (1 minute now).
     public void testSaslBruteForceLockoutInterval(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceLockoutInterval(%s)\n", mechanism);
 
-        performSaslTest(mechanism.getMechanismName(), "user3", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user3", "passwordX", false);
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
         Thread.sleep(61000);
-        performSaslTest(mechanism.getMechanismName(), "user3", "password3", true);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
     // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short session timout for tests (1 minute now).
     public void testSaslBruteForceSessionTimeout(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceSessionTimeout(%s)\n", mechanism);
 
-        performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
         Thread.sleep(121000);
-        performSaslTest(mechanism.getMechanismName(), "user4", "passwordX", false);
-        performSaslTest(mechanism.getMechanismName(), "user4", "password4", true);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
     public void testSaslBruteForceDisabled(final SaslAuthenticationMechanism mechanism) throws Exception {
@@ -121,9 +132,10 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         }
 
         try {
-            performSaslTest(mechanism.getMechanismName(), "user5", "passwordX", false);
-            performSaslTest(mechanism.getMechanismName(), "user5", "passwordX", false);
-            performSaslTest(mechanism.getMechanismName(), "user5", "password5", true);
+            IdentityDefinition identityOne = nextIdentity();
+            performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+            performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+            performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
                 client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();

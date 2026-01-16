@@ -36,6 +36,10 @@ public abstract class AbstractAuthenticationSuite {
     protected static final Path SERVER_CONFIG_DIR = Paths.get(System.getProperty("jboss.home")).toAbsolutePath()
             .resolve("standalone").resolve("configuration");
 
+    private static final String USERNAME_PATTERN = "user%d";
+    private static final String PASSWORD_PATTERN = "password%d";
+    private static int NEXT_USER = 1;
+
     private static volatile SecurityRealmRegistrar securityRealmRegistrar;
     private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
     private static volatile Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms;
@@ -72,14 +76,25 @@ public abstract class AbstractAuthenticationSuite {
     static Stream<IdentityDefinition> obtainTestIdentities() {
         // Register a lot of identities so each test can use it's own without
         // state being contaminated from other tests.
-        List<IdentityDefinition> identities = new ArrayList<>(100);
-        for (int i = 1 ; i < 100 ; i++) {
-            identities.add(new IdentityDefinition(String.format("user%d", i),
-                    String.format("password%d", i)));
+        List<IdentityDefinition> identities = new ArrayList<>(250);
+        for (int i = 1 ; i < 250 ; i++) {
+            identities.add(new IdentityDefinition(String.format(USERNAME_PATTERN , i),
+                    String.format(PASSWORD_PATTERN, i)));
         }
 
+        NEXT_USER = 1;
         return identities.stream();
     }
 
-    record IdentityDefinition(String username, String password) {}
+    public record IdentityDefinition(String username, String password) {}
+
+    public static IdentityDefinition nextIdentity() {
+        int id = NEXT_USER++;
+        if (id > 250) {
+            throw new IllegalStateException("Exceeded available identities.");
+        }
+
+        return new IdentityDefinition(String.format(USERNAME_PATTERN , id),
+                    String.format(PASSWORD_PATTERN, id));
+    }
 }
