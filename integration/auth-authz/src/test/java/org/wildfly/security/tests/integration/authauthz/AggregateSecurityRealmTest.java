@@ -42,7 +42,7 @@ public class AggregateSecurityRealmTest extends AbstractAuthenticationSuite {
 
     @BeforeSuite
     public static void beginRealm() {
-        register(SecurityRealmRegistrar.create(() -> REALM_TYPE, () -> REALM_NAME,
+        register(SecurityRealmRegistrar.create(() -> REALM_TYPE, () -> REALM_NAME, () -> new String[] { AUTHN_REALM_NAME},
                                             AggregateSecurityRealmTest::registerSecurityRealm, AggregateSecurityRealmTest::removeSecurityRealm),
                 AggregateSecurityRealmTest::realmHttpMechanisms,
                 AggregateSecurityRealmTest::realmSaslMechanisms);
@@ -61,20 +61,14 @@ public class AggregateSecurityRealmTest extends AbstractAuthenticationSuite {
     }
 
     static void registerSecurityRealm(OnlineManagementClient managementClient) throws IOException {
-        try (PrintStream out = new PrintStream(new FileOutputStream(AUTHN_REALM_USERS))) {
+        try (PrintStream authn = new PrintStream(new FileOutputStream(AUTHN_REALM_USERS));
+             PrintStream authz = new PrintStream(new FileOutputStream(AUTHZ_REALM_ROLES));) {
             obtainTestIdentities().forEach(identity -> {
-                out.println(String.format("%s=%s", identity.username(), identity.password()));
+                authn.println(String.format("%s=%s", identity.username(), identity.password()));
+                authz.println(String.format("%s=%s", identity.username(), "admin"));
             });
         } catch (FileNotFoundException ex) {
             throw new IllegalStateException("Creating users properties file for properties security realm failed: " + ex.getMessage());
-        }
-
-        try (PrintStream out = new PrintStream(new FileOutputStream(AUTHZ_REALM_ROLES))) {
-            obtainTestIdentities().forEach(identity -> {
-                out.println(String.format("%s=%s", identity.username(), "admin"));
-            });
-        } catch (FileNotFoundException ex) {
-            throw new IllegalStateException("Creating roles properties file for properties security realm failed: " + ex.getMessage());
         }
 
         try {

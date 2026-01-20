@@ -30,9 +30,27 @@ public interface SecurityRealmRegistrar {
      * Returns the name the security realm will be / is registered to on the
      * application server under test.
      *
+     * This is the name of the security realm that the {@code SecurityDomain}
+     * will reference.
+     *
      * @return the name the security realm is registered under.
      */
-    public String getRealmName();
+    public String getPrimaryRealmName();
+
+
+    /**
+     * The primary security realm may be delegating to one or more delegate
+     * realms.
+     *
+     * These are the realms that additional test configuration may be applied
+     * such as brute force protection.
+     *
+     * The name of the delegate realm will match the primary realm when no
+     * additional delegates exist.
+     *
+     * @return An array of delegate realm names.
+     */
+    public String[] getDelegateRealmNames();
 
 
     /**
@@ -65,6 +83,14 @@ public interface SecurityRealmRegistrar {
                                                 Supplier<String> realmNameSupplier,
                                                 ExceptionConsumer<OnlineManagementClient, IOException> registerConsumer,
                                                 ExceptionConsumer<OnlineManagementClient, IOException> unRegisterConsumer) {
+        return create(realmTypeSupplier, realmNameSupplier, () -> new String[] { realmNameSupplier.get() }, registerConsumer, unRegisterConsumer);
+    }
+
+    public static SecurityRealmRegistrar create(Supplier<String> realmTypeSupplier,
+                                                Supplier<String> primaryRealmNameSupplier,
+                                                Supplier<String[]> delegateRealmNameSupplier,
+                                                ExceptionConsumer<OnlineManagementClient, IOException> registerConsumer,
+                                                ExceptionConsumer<OnlineManagementClient, IOException> unRegisterConsumer) {
         return new SecurityRealmRegistrar() {
 
             @Override
@@ -73,8 +99,13 @@ public interface SecurityRealmRegistrar {
             }
 
             @Override
-            public String getRealmName() {
-                return realmNameSupplier.get();
+            public String getPrimaryRealmName() {
+                return primaryRealmNameSupplier.get();
+            }
+
+            @Override
+            public String[] getDelegateRealmNames() {
+                return delegateRealmNameSupplier.get();
             }
 
             @Override

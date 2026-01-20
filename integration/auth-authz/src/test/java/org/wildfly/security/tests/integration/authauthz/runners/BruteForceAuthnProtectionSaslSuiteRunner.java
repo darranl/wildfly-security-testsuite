@@ -31,8 +31,8 @@ import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSu
 @ServerSetup(BruteForceAuthnProtectionSaslSuiteRunner.ConfigurationServerSetupTask.class)
 public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteRunner {
 
-    static String realmName() {
-        return AbstractAuthenticationSuite.getSecurityRealmRegistrar().getRealmName();
+    static String[] delegateRealmNames() {
+        return AbstractAuthenticationSuite.getSecurityRealmRegistrar().getDelegateRealmNames();
     }
 
      @TestFactory
@@ -127,7 +127,9 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
     public void testSaslBruteForceDisabled(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceDisabled(%s)\n", mechanism);
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-            client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", realmName())).assertSuccess();
+            for (String realmName : delegateRealmNames()) {
+                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", realmName)).assertSuccess();
+            }
             new Administration(client).reload();
         }
 
@@ -138,7 +140,9 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
             performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
         } finally {
             try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
-                client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName())).assertSuccess();
+                for (String realmName : delegateRealmNames()) {
+                    client.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", realmName)).assertSuccess();
+                }
                 new Administration(client).reload();
             }
         }
@@ -149,9 +153,11 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         @Override
         protected Map<String, String> getRequiredSystemProperties() {
             Map<String, String> properties = new HashMap<>();
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName()), "2");
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName()), "1");
-            properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName()), "2");
+            for (String realmName : delegateRealmNames()) {
+                properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName), "2");
+                properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName), "1");
+                properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName), "2");
+            }
             return properties;
         }
 

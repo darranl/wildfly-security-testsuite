@@ -17,7 +17,6 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.concurrent.Callable;
 
 import javax.naming.Context;
@@ -51,7 +50,7 @@ abstract class AbstractSaslSuiteRunner {
 
     @Deployment(testable = false)
     public static WebArchive deployment() {
-        final String testRealmName = AbstractAuthenticationSuite.getSecurityRealmRegistrar().getRealmName();
+        final String testRealmName = AbstractAuthenticationSuite.getSecurityRealmRegistrar().getPrimaryRealmName();
         final WebArchive war = ShrinkWrap.create(WebArchive.class, String.format("sasl-suite-%s.war", testRealmName))
                 .addAsWebInfResource(createJBossWebXml(String.format("ejb-app-domain-%s", testRealmName)), "jboss-web.xml")
                 .addClass(SecuredEjb.class)
@@ -62,7 +61,7 @@ abstract class AbstractSaslSuiteRunner {
     static void performSaslTest(final String mechanism, final String userName, final String password,
             final boolean expectSuccess) throws Exception {
 
-        final String testRealmName = AbstractAuthenticationSuite.getSecurityRealmRegistrar().getRealmName();
+        final String testRealmName = AbstractAuthenticationSuite.getSecurityRealmRegistrar().getPrimaryRealmName();
         final AuthenticationContext authContext = AuthenticationContext.empty()
                 .with(MatchRule.ALL, AuthenticationConfiguration.empty()
                         .useName(userName)
@@ -105,7 +104,7 @@ abstract class AbstractSaslSuiteRunner {
             SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
             try (OnlineManagementClient client = onlineManagementClient()) {
                 securityRealmRegistrar.register(client);
-                String testRealmName = securityRealmRegistrar.getRealmName();
+                String testRealmName = securityRealmRegistrar.getPrimaryRealmName();
                 List<String> mechanismConfiguration = new ArrayList<>();
                 for (SaslAuthenticationMechanism saslMech : AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms()) {
                     mechanismConfiguration.add(String.format(
@@ -138,7 +137,7 @@ abstract class AbstractSaslSuiteRunner {
         public void tearDown(ManagementClient managementClient, String s) throws Exception {
             // TODO Can we do something similar to WildFly and restore a SNAPSHOT?
             SecurityRealmRegistrar securityRealmRegistrar = AbstractAuthenticationSuite.getSecurityRealmRegistrar();
-            String testRealmName = securityRealmRegistrar.getRealmName();
+            String testRealmName = securityRealmRegistrar.getPrimaryRealmName();
             try (OnlineManagementClient client = onlineManagementClient()) {
                 for (String key : getRequiredSystemProperties().keySet()) {
                     client.execute(String.format("/system-property=%s:remove", key)).assertSuccess();

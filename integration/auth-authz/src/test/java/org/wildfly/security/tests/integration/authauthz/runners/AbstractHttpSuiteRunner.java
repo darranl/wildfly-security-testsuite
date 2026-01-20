@@ -145,7 +145,7 @@ abstract class AbstractHttpSuiteRunner {
             // single definition.
             try (OnlineManagementClient client = onlineManagementClient()) {
                 securityRealmRegistrar.register(client);
-                String testRealmName = securityRealmRegistrar.getRealmName();
+                String testRealmName = securityRealmRegistrar.getPrimaryRealmName();
                 client.execute(String.format("/subsystem=elytron/security-domain=ely-domain-http:add("
                             + "default-realm=%s, permission-mapper=default-permission-mapper, "
                             + "realms=[{realm=%s, role-decoder=groups-to-roles}])",
