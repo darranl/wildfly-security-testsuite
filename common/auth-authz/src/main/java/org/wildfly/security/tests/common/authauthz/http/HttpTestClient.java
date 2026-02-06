@@ -16,7 +16,6 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpClient.Version;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.util.function.BiFunction;
 
 import org.wildfly.common.function.ExceptionBiFunction;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;

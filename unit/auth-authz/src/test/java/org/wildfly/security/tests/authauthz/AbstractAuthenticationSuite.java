@@ -12,7 +12,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.Supplier;
+import java.util.function.UnaryOperator;
 import java.util.stream.Stream;
 
 import org.junit.platform.suite.api.AfterSuite;
@@ -21,9 +24,12 @@ import org.junit.platform.suite.api.SelectClasses;
 import org.junit.platform.suite.api.Suite;
 import org.wildfly.security.WildFlyElytronProvider;
 import org.wildfly.security.auth.permission.LoginPermission;
+import org.wildfly.security.auth.realm.BruteForceRealmWrapper;
 import org.wildfly.security.auth.server.SecurityDomain;
 import org.wildfly.security.auth.server.SecurityRealm;
 import org.wildfly.security.permission.PermissionVerifier;
+import org.wildfly.security.tests.authauthz.runners.BruteForceAuthnProtectionHttpSuiteRunner;
+import org.wildfly.security.tests.authauthz.runners.BruteForceAuthnProtectionSaslSuiteRunner;
 import org.wildfly.security.tests.authauthz.runners.StandardHttpSuiteRunner;
 import org.wildfly.security.tests.authauthz.runners.StandardSaslSuiteRunner;
 import org.wildfly.security.tests.common.authauthz.HttpAuthenticationMechanism;
@@ -38,7 +44,9 @@ import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 @Suite
 @SelectClasses(value = {
         StandardHttpSuiteRunner.class,
-        StandardSaslSuiteRunner.class
+        StandardSaslSuiteRunner.class,
+        BruteForceAuthnProtectionHttpSuiteRunner.class,
+        BruteForceAuthnProtectionSaslSuiteRunner.class
 })
 public abstract class AbstractAuthenticationSuite {
 
@@ -58,6 +66,8 @@ public abstract class AbstractAuthenticationSuite {
     private static volatile Supplier<SecurityRealm> securityRealmSupplier;
     private static volatile Supplier<Set<HttpAuthenticationMechanism>> supportedHttpAuthenticationMechanisms;
     private static volatile Supplier<Set<SaslAuthenticationMechanism>> supportedSaslAuthenticationMechanisms;
+    // Executor
+    private static volatile ScheduledExecutorService executorService;
 
     /*
      * New Registration Methods
@@ -69,6 +79,16 @@ public abstract class AbstractAuthenticationSuite {
         AbstractAuthenticationSuite.securityRealmSupplier = securityRealmSupplier;
         AbstractAuthenticationSuite.supportedHttpAuthenticationMechanisms = supportedHttpAuthenticationMechanisms;
         AbstractAuthenticationSuite.supportedSaslAuthenticationMechanisms = supportedSaslAuthenticationMechanisms;
+        if (realmType != null) {
+            // Only need one thread as just used to trigger timeouts.
+            executorService = Executors.newScheduledThreadPool(1);
+        } else if (executorService != null) {
+            try {
+                executorService.shutdown();
+            } finally {
+                executorService = null;
+            }
+        }
     }
 
     public static String realmType() {
@@ -79,9 +99,9 @@ public abstract class AbstractAuthenticationSuite {
         return securityRealmSupplier != null;
     }
 
-    public static SecurityDomain createSecurityDomain() {
+    public static SecurityDomain createSecurityDomain(UnaryOperator<SecurityRealm> realmTransformer) {
         final SecurityDomain.Builder domainBuilder = SecurityDomain.builder();
-        domainBuilder.addRealm(REALM_NAME, securityRealmSupplier.get()).build();
+        domainBuilder.addRealm(REALM_NAME, realmTransformer.apply(securityRealmSupplier.get())).build();
         domainBuilder.setDefaultRealmName(REALM_NAME);
 
         // Just grant login permission for now.
@@ -89,6 +109,17 @@ public abstract class AbstractAuthenticationSuite {
                 (p, r) -> PermissionVerifier.from(new LoginPermission()));
 
         return domainBuilder.build();
+    }
+
+    public static SecurityDomain createSecurityDomain() {
+        return createSecurityDomain(AbstractAuthenticationSuite::applyDefaultBruteForceProtection);
+    }
+
+    private static SecurityRealm applyDefaultBruteForceProtection(final SecurityRealm original) {
+        return BruteForceRealmWrapper.create()
+            .wrapping(original)
+            .withExecutor(executorService)
+            .wrap(SecurityRealm.class);
     }
 
     public static Set<HttpAuthenticationMechanism> supportedHttpAuthenticationMechanisms() {

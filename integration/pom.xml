@@ -41,6 +41,7 @@
     <version.org.wildfly.arquillian>5.1.0.Final</version.org.wildfly.arquillian>
     <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
     <version.wildfly>38.0.1.Final</version.wildfly>
+    <wildfly.jpda.args></wildfly.jpda.args>
   </properties>
 
   <dependencyManagement>
@@ -160,6 +161,7 @@
           <configuration>
             <systemPropertyVariables>
               <jboss.home>${wildfly.home}</jboss.home>
+              <server.jvm.args>${wildfly.jpda.args}</server.jvm.args>
             </systemPropertyVariables>
             <environmentVariables>
                 <JBOSS_HOME>${wildfly.home}</JBOSS_HOME>
@@ -169,5 +171,19 @@
       </plugins>
     </pluginManagement>
   </build>
+
+  <profiles>
+    <profile>
+      <id>debug-server</id>
+      <activation>
+        <property>
+          <name>debug-server</name>
+        </property>
+      </activation>
+      <properties>
+        <wildfly.jpda.args>-agentlib:jdwp=transport=dt_socket,address=*:8787,server=y,suspend=y</wildfly.jpda.args>
+      </properties>
+    </profile>
+  </profiles>
 
 </project>

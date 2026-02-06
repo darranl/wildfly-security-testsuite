@@ -5,36 +5,22 @@
 
 package org.wildfly.security.tests.authauthz.runners;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.security.PrivilegedAction;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Stream;
 
-import javax.security.sasl.SaslException;
-
-import org.jboss.remoting3.Connection;
-import org.jboss.remoting3.Endpoint;
 import org.junit.jupiter.api.DynamicTest;
 import org.junit.jupiter.api.TestFactory;
-import org.wildfly.security.auth.client.AuthenticationConfiguration;
-import org.wildfly.security.auth.client.AuthenticationContext;
-import org.wildfly.security.auth.client.MatchRule;
-import org.wildfly.security.sasl.SaslMechanismSelector;
 import org.wildfly.security.tests.authauthz.AbstractAuthenticationSuite;
 import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
-import org.xnio.IoFuture;
 
 /**
  * A runner for standard SASL authentication against the configured {@code SecurityRealm}.
@@ -105,44 +91,4 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
         performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
     }
 
-    private void performSaslTest(final String mechanism, final String userName,
-                                 final String password, final boolean expectSuccess) throws IOException {
-
-        AuthenticationContext authContext = AuthenticationContext.empty()
-                .with(MatchRule.ALL, AuthenticationConfiguration.empty()
-                        .useName(userName)
-                        .usePassword(password)
-                        .setSaslMechanismSelector(SaslMechanismSelector.fromString(mechanism))
-                );
-
-        Endpoint endpoint = getEndpoint();
-
-        IoFuture<Connection> futureConnection = authContext.run(
-                (PrivilegedAction<IoFuture<Connection>>) () ->
-                        endpoint.connect(toUri("remote://localhost:30123"),
-                                optionMap)
-        );
-
-        IoFuture.Status status = futureConnection.await(5000, TimeUnit.MILLISECONDS);
-
-        if (expectSuccess) {
-            assertEquals(IoFuture.Status.DONE, status, "Expected IoFuture to be DONE");
-            try (Connection connection = futureConnection.get()) {
-                assertNotNull(connection, "Expected a connection to have been opened");
-            }
-        } else {
-            assertEquals(IoFuture.Status.FAILED, status, "Expected IoFuture to be FAILED");
-            Exception e = futureConnection.getException();
-            assertEquals(SaslException.class, e.getClass(), "Expected SaslException");
-            assertTrue(e.getMessage().contains("rejected authentication"), "Expected authentication to be rejected.");
-        }
-    }
-
-    static URI toUri(final String uri) {
-        try {
-            return new URI(uri);
-        } catch (URISyntaxException e) {
-            throw new IllegalArgumentException(e);
-        }
-    }
 }

@@ -6,6 +6,7 @@
 package org.wildfly.security.tests.integration.authauthz.runners;
 
 import static org.junit.jupiter.api.DynamicTest.dynamicTest;
+import static org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.nextIdentity;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.wildfly.security.tests.common.authauthz.SaslAuthenticationMechanism;
 import org.wildfly.security.tests.common.authauthz.TestFamily;
 import org.wildfly.security.tests.common.authauthz.TestFilter;
 import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite;
+import org.wildfly.security.tests.integration.authauthz.AbstractAuthenticationSuite.IdentityDefinition;
 
 public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
 
@@ -60,7 +62,8 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
     public void testSaslSuccess(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslSuccess(%s)\n", mechanism);
 
-        performSaslTest(mechanism.getMechanismName(), "user1", "password1", true);
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
     public void testSaslBadUsername(final SaslAuthenticationMechanism mechanism) throws Exception {
@@ -72,6 +75,7 @@ public class StandardSaslSuiteRunner extends AbstractSaslSuiteRunner {
     public void testSaslBadPassword(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBadPassword(%s)\n", mechanism);
 
-        performSaslTest(mechanism.getMechanismName(), "user1", "passwordX", false);
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
     }
 }

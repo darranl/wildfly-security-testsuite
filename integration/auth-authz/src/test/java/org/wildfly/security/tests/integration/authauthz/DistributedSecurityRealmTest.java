@@ -6,7 +6,6 @@
 package org.wildfly.security.tests.integration.authauthz;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
@@ -27,15 +26,22 @@ public class DistributedSecurityRealmTest extends AbstractAuthenticationSuite {
 
     private static final String REALM_NAME = "test-distributed-realm";
     private static final String REALM_TYPE = "distributed-realm";
-    private static final String TOKEN_REALM_NAME = "test-properties-token-realm";
-    private static final String TOKEN_REALM_TYPE = "token-realm";
-    private static final String PROPERTIES_REALM_NAME = "test-properties-distributed-realm";
+
+    private static final String REALM_ONE = "properties-realm-one";
+    private static final String REALM_ONE_USERS = "test-properties-realm-one-users.properties";
+    private static final String REALM_ONE_ROLES = "test-properties-realm-one-roles.properties";
+
+    private static final String REALM_TWO = "properties-realm-two";
+    private static final String REALM_TWO_USERS = "test-properties-realm-two-users.properties";
+    private static final String REALM_TWO_ROLES = "test-properties-realm-two-roles.properties";
+
+
+    private static final String REALM_THREE = "properties-realm-three";
+    private static final String REALM_THREE_USERS = "test-properties-realm-three-users.properties";
+    private static final String REALM_THREE_ROLES = "test-properties-realm-three-roles.properties";
+
     private static final String PROPERTIES_REALM_TYPE = "properties-realm";
 
-    private static final String PROPERTIES_REALM_USERS_PATH = "test-properties-distributed-realm-users.properties";
-    private static final File PROPERTIES_REALM_USERS = SERVER_CONFIG_DIR.resolve(PROPERTIES_REALM_USERS_PATH).toFile();
-    private static final String PROPERTIES_REALM_ROLES_PATH = "test-properties-distributed-realm-roles.properties";
-    private static final File PROPERTIES_REALM_ROLES = SERVER_CONFIG_DIR.resolve(PROPERTIES_REALM_ROLES_PATH).toFile();
 
     private volatile static boolean realmRegistered = false;
 
@@ -49,43 +55,70 @@ public class DistributedSecurityRealmTest extends AbstractAuthenticationSuite {
 
     @AfterSuite
     public static void endRealm() throws IOException {
-        if (PROPERTIES_REALM_USERS.exists()) {
-            PROPERTIES_REALM_USERS.delete();
-        }
-        if (PROPERTIES_REALM_ROLES.exists()) {
-            PROPERTIES_REALM_ROLES.delete();
-        }
-
+        delete(REALM_ONE_USERS);
+        delete(REALM_ONE_ROLES);
+        delete(REALM_TWO_USERS);
+        delete(REALM_TWO_ROLES);
+        delete(REALM_THREE_USERS);
+        delete(REALM_THREE_ROLES);
         register(null, null, null);
     }
 
-    static void registerSecurityRealm(OnlineManagementClient managementClient) throws IOException {
-        try (PrintStream out = new PrintStream(new FileOutputStream(PROPERTIES_REALM_USERS))) {
-            obtainTestIdentities().forEach(identity -> {
-                out.println(String.format("%s=%s", identity.username(), identity.password()));
-            });
-        } catch (FileNotFoundException ex) {
-            throw new IllegalStateException("Creating users properties file for properties security realm failed: " + ex.getMessage());
+    private static void delete(String fileName)  {
+        File file = SERVER_CONFIG_DIR.resolve(fileName).toFile();
+        if (file.exists()) {
+            file.delete();
         }
+    }
 
-        try (PrintStream out = new PrintStream(new FileOutputStream(PROPERTIES_REALM_ROLES))) {
+    private static int index = 0;
+
+    static void registerSecurityRealm(OnlineManagementClient managementClient) throws IOException {
+        PrintStream[] usersFiles = new PrintStream[3];
+        PrintStream[] rolesFiles = new PrintStream[3];
+
+        try {
+            usersFiles[0] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_ONE_USERS).toFile()));
+            usersFiles[1] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_TWO_USERS).toFile()));
+            usersFiles[2] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_THREE_USERS).toFile()));
+            rolesFiles[0] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_ONE_ROLES).toFile()));
+            rolesFiles[1] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_TWO_ROLES).toFile()));
+            rolesFiles[2] = new PrintStream(new FileOutputStream(SERVER_CONFIG_DIR.resolve(REALM_THREE_ROLES).toFile()));
+
+            index = 0;
             obtainTestIdentities().forEach(identity -> {
-                out.println(String.format("%s=%s", identity.username(), "admin"));
+                usersFiles[index].println(String.format("%s=%s", identity.username(), identity.password()));
+                rolesFiles[index].println(String.format("%s=%s", identity.username(), "admin"));
+                index = (index + 1) % 3;
             });
-        } catch (FileNotFoundException ex) {
-            throw new IllegalStateException("Creating roles properties file for properties security realm failed: " + ex.getMessage());
+
+        } finally {
+            for (int i = 0 ; i < usersFiles.length ; i++) {
+                if (usersFiles[i] != null) usersFiles[i].close();
+                usersFiles[i] = null;
+                if (rolesFiles[i] != null) rolesFiles[i].close();
+                rolesFiles[i] = null;
+            }
         }
 
         try {
-            managementClient.execute(String.format("/subsystem=elytron/%s=%s:add(jwt={issuer=[\"issuer1.wildfly.org\"]})",
-                    TOKEN_REALM_TYPE, TOKEN_REALM_NAME)).assertSuccess();
             managementClient.execute(String.format("/subsystem=elytron/%s=%s:add("
                     + "users-properties={path=%s, plain-text=true, relative-to=jboss.server.config.dir}, "
                     + "groups-properties={path=%s, relative-to=jboss.server.config.dir})",
-                    PROPERTIES_REALM_TYPE, PROPERTIES_REALM_NAME, PROPERTIES_REALM_USERS_PATH, PROPERTIES_REALM_ROLES_PATH))
+                    PROPERTIES_REALM_TYPE, REALM_ONE, REALM_ONE_USERS, REALM_ONE_ROLES))
                     .assertSuccess();
-            managementClient.execute(String.format("/subsystem=elytron/%s=%s:add(realms=[%s,%s])",
-                    REALM_TYPE, REALM_NAME, TOKEN_REALM_NAME, PROPERTIES_REALM_NAME)).assertSuccess();
+            managementClient.execute(String.format("/subsystem=elytron/%s=%s:add("
+                    + "users-properties={path=%s, plain-text=true, relative-to=jboss.server.config.dir}, "
+                    + "groups-properties={path=%s, relative-to=jboss.server.config.dir})",
+                    PROPERTIES_REALM_TYPE, REALM_TWO, REALM_TWO_USERS, REALM_TWO_ROLES))
+                    .assertSuccess();
+            managementClient.execute(String.format("/subsystem=elytron/%s=%s:add("
+                    + "users-properties={path=%s, plain-text=true, relative-to=jboss.server.config.dir}, "
+                    + "groups-properties={path=%s, relative-to=jboss.server.config.dir})",
+                    PROPERTIES_REALM_TYPE, REALM_THREE, REALM_THREE_USERS, REALM_THREE_ROLES))
+                    .assertSuccess();
+            managementClient.execute(String.format("/subsystem=elytron/%s=%s:add(realms=[%s,%s,%s])",
+                    REALM_TYPE, REALM_NAME, REALM_ONE, REALM_TWO, REALM_THREE)).assertSuccess();
             realmRegistered = true;
         } catch (CliException e) {
             throw new IOException("Unable to register security realm configuration.", e);
@@ -99,9 +132,11 @@ public class DistributedSecurityRealmTest extends AbstractAuthenticationSuite {
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
                     REALM_TYPE, REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
-                    PROPERTIES_REALM_TYPE, PROPERTIES_REALM_NAME)).assertSuccess();
+                    PROPERTIES_REALM_TYPE, REALM_ONE)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
-                    TOKEN_REALM_TYPE, TOKEN_REALM_NAME)).assertSuccess();
+                    PROPERTIES_REALM_TYPE, REALM_TWO)).assertSuccess();
+                managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
+                    PROPERTIES_REALM_TYPE, REALM_THREE)).assertSuccess();
                 realmRegistered = false;
             }
         } catch (CliException e) {
