@@ -27,5 +27,9 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
       - name: Version Info
         run: mvn -version
-      - name: Build with Maven
-        run: mvn -B verify --file pom.xml -D"TestFilter.TestFamily"=STANDARD
+      - name: Build with Maven (No Test)
+        run: mvn -B install --file pom.xml -DskipTests
+      - name: Execute Unit Tests
+        run: mvn -B verify --file pom.xml -pl unit/auth-authz/
+      - name: Execute Integration Tests
+        run: mvn -B verify --file pom.xml -pl integration/auth-authz/ -D"TestFilter.TestFamily"=STANDARD
