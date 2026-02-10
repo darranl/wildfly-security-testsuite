@@ -100,6 +100,13 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
         testClient.testHttpBadPassword(mechanism, identityTwo.username(), "passwordX");
         testClient.testHttpBadPassword(mechanism, identityTwo.username(), "passwordX");
         testClient.testHttpBadPassword(mechanism, identityTwo.username(), identityTwo.password());
+
+        // 3 various identites from 3 different realms of distributed-realm
+        IdentityDefinition identityThree = nextIdentity();
+        testClient.testHttpSuccess(mechanism, identityThree.username(), identityThree.password());
+        testClient.testHttpBadPassword(mechanism, identityThree.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityThree.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityThree.username(), identityThree.password());
     }
 
     public void testHttpBruteForceLockoutInterval(final HttpAuthenticationMechanism mechanism) throws Exception {

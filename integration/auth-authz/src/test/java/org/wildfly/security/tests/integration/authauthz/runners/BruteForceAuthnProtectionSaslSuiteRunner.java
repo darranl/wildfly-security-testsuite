@@ -95,14 +95,18 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), false);
 
-        //performSaslTest(mechanism.getMechanismName(), "user2", "password2", true);
         IdentityDefinition identityTwo = nextIdentity();
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), identityTwo.password(), false);
+
+        // 3 various identites from 3 different realms of distributed-realm
+        IdentityDefinition identityThree = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), identityThree.password(), false);
     }
 
-    // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short lockout interval for tests (1 minute now).
     public void testSaslBruteForceLockoutInterval(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceLockoutInterval(%s)\n", mechanism);
 
@@ -113,7 +117,6 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
-    // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short session timout for tests (1 minute now).
     public void testSaslBruteForceSessionTimeout(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceSessionTimeout(%s)\n", mechanism);
 

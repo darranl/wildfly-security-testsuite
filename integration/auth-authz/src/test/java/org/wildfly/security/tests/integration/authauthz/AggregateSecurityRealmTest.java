@@ -72,6 +72,7 @@ public class AggregateSecurityRealmTest extends AbstractAuthenticationSuite {
         }
 
         try {
+            managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=1)", REALM_NAME)).assertSuccess();
             managementClient.execute(String.format("/subsystem=elytron/%s=%s:add("
                     + "users-properties={path=%s, plain-text=true, relative-to=jboss.server.config.dir})",
                     AUTHN_REALM_TYPE, AUTHN_REALM_NAME, AUTHN_REALM_USERS_PATH))
@@ -95,6 +96,7 @@ public class AggregateSecurityRealmTest extends AbstractAuthenticationSuite {
     static void removeSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try {
             if (realmRegistered) {
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
                     REALM_TYPE, REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",

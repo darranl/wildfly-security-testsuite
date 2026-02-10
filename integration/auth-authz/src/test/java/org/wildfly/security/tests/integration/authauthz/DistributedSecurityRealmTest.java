@@ -10,6 +10,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Set;
 
 import org.junit.platform.suite.api.AfterSuite;
@@ -102,6 +103,14 @@ public class DistributedSecurityRealmTest extends AbstractAuthenticationSuite {
         }
 
         try {
+            // setup underlying realms differently so that we test that their configuration is not taken into account
+            for (String realmName : List.of(REALM_TWO, REALM_THREE)) {
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=20)", realmName)).assertSuccess();
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:add(value=10)", realmName)).assertSuccess();
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:add(value=20)", realmName)).assertSuccess();
+            }
+            managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:add(value=false)", REALM_ONE)).assertSuccess();
+
             managementClient.execute(String.format("/subsystem=elytron/%s=%s:add("
                     + "users-properties={path=%s, plain-text=true, relative-to=jboss.server.config.dir}, "
                     + "groups-properties={path=%s, relative-to=jboss.server.config.dir})",
@@ -129,6 +138,12 @@ public class DistributedSecurityRealmTest extends AbstractAuthenticationSuite {
     static void removeSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try {
             if (realmRegistered) {
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.enabled:remove", REALM_ONE)).assertSuccess();
+                for (String realmName : List.of(REALM_TWO, REALM_THREE)) {
+                    managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", realmName)).assertSuccess();
+                    managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.lockout-interval:remove", realmName)).assertSuccess();
+                    managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.session-timeout:remove", realmName)).assertSuccess();
+                }
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
                     REALM_TYPE, REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
