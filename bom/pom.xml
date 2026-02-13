@@ -33,9 +33,9 @@
 
   <properties>
     <version.io.smallrye.smallrye-common>2.14.0</version.io.smallrye.smallrye-common>
-    <version.io.undertow>2.3.20.Final</version.io.undertow>
-    <version.jakarta.annotation.jakarta-annotation-api>3.0.0</version.jakarta.annotation.jakarta-annotation-api>
-    <version.jakarta.authentication.jakarta.authentication-api>2.0.0</version.jakarta.authentication.jakarta.authentication-api>
+    <version.io.undertow>2.3.23.Final</version.io.undertow>
+    <version.jakarta.annotation.jakarta-annotation-api>2.1.1</version.jakarta.annotation.jakarta-annotation-api>
+    <version.jakarta.authentication.jakarta.authentication-api>3.0.0</version.jakarta.authentication.jakarta.authentication-api>
     <version.jakarta.ejb.jakarta-ejb-api>4.0.1</version.jakarta.ejb.jakarta-ejb-api>
     <version.jakarta.servlet.jakarta-servlet-api>6.0.0</version.jakarta.servlet.jakarta-servlet-api>
     <version.org.hsqldb>2.7.4</version.org.hsqldb>
@@ -44,10 +44,10 @@
     <version.org.jboss.logmanager.jboss-logmanager>2.1.19.Final</version.org.jboss.logmanager.jboss-logmanager>
     <version.org.jboss.remoting>5.0.31.Final</version.org.jboss.remoting>
     <version.org.jboss.threads>3.9.2</version.org.jboss.threads>
-    <version.org.jboss.xnio>3.8.17.Final</version.org.jboss.xnio>
+    <version.org.jboss.xnio>3.8.16.Final</version.org.jboss.xnio>
     <version.org.wildfly.client.config>1.0.1.Final</version.org.wildfly.client.config>
     <version.org.wildfly.common>2.0.1</version.org.wildfly.common>
-    <version.org.wildfly.elytron>2.8.0.Final</version.org.wildfly.elytron>
+    <version.org.wildfly.elytron>2.8.2.Final</version.org.wildfly.elytron>
     <version.org.wildfly.elytron.web>4.1.2.Final</version.org.wildfly.elytron.web>
   </properties>
 
@@ -567,4 +567,80 @@
     </dependencies>
   </dependencyManagement>
 
+    <repositories>
+        <repository>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss-public-jboss-repository-group</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>maven-central</id>
+            <url>https://repo1.maven.org/maven2/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-public-jboss-repository-group</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public-jboss/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+        <pluginRepository>
+            <id>jboss-public-repository-group</id>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 </project>
