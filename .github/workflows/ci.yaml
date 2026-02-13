@@ -32,4 +32,4 @@ jobs:
       - name: Execute Unit Tests
         run: mvn -B verify --file pom.xml -pl unit/auth-authz/
       - name: Execute Integration Tests
-        run: mvn -B verify --file pom.xml -pl integration/auth-authz/ -D"TestFilter.TestFamily"=STANDARD
+        run: mvn -B verify --file pom.xml -pl integration/auth-authz/ 
