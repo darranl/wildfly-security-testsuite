@@ -40,7 +40,7 @@
     <version.org.jboss.shrinkwrap.descriptors>2.0.0</version.org.jboss.shrinkwrap.descriptors>
     <version.org.wildfly.arquillian>5.1.0.Final</version.org.wildfly.arquillian>
     <version.org.wildfly.extras.creaper>2.0.3</version.org.wildfly.extras.creaper>
-    <version.wildfly>38.0.1.Final</version.wildfly>
+    <version.wildfly>39.0.1.Final</version.wildfly>
     <wildfly.jpda.args></wildfly.jpda.args>
   </properties>
 
