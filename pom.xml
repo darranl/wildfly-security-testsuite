@@ -45,7 +45,7 @@
     <version.org.apache.httpclient>5.5</version.org.apache.httpclient>
     <version.org.apache.httpcomponents>4.4.16</version.org.apache.httpcomponents>
     <version.com.h2database.h2>2.4.240</version.com.h2database.h2>
-    <version.org.junit>6.0.1</version.org.junit>
+    <version.org.junit>6.0.2</version.org.junit>
     <version.org.wildfly.plugins.wildfly-maven-plugin>5.1.5.Final</version.org.wildfly.plugins.wildfly-maven-plugin>
     <version.org.wildfly.security.testsuite.wildfly-security-testsuite-bom>${project.version}</version.org.wildfly.security.testsuite.wildfly-security-testsuite-bom>
 
