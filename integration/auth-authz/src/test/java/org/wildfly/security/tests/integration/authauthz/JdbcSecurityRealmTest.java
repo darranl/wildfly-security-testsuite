@@ -115,7 +115,11 @@ public class JdbcSecurityRealmTest extends AbstractAuthenticationSuite {
                 SaslAuthenticationMechanism.DIGEST_SHA,
                 SaslAuthenticationMechanism.DIGEST_SHA_256,
                 SaslAuthenticationMechanism.DIGEST_SHA_384,
-                SaslAuthenticationMechanism.DIGEST_SHA_512);
+                SaslAuthenticationMechanism.DIGEST_SHA_512,
+                SaslAuthenticationMechanism.SCRAM_SHA_1,
+                SaslAuthenticationMechanism.SCRAM_SHA_256,
+                SaslAuthenticationMechanism.SCRAM_SHA_384,
+                SaslAuthenticationMechanism.SCRAM_SHA_512);
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {
