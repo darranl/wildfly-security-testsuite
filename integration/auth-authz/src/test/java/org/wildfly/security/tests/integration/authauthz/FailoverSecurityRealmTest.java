@@ -77,6 +77,8 @@ public class FailoverSecurityRealmTest extends AbstractAuthenticationSuite {
         }
 
         try {
+            // setup underlying realms differently so that we test that their configuration is not taken into account
+            managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=1)", FAILOVER_REALM_NAME)).assertSuccess();
             managementClient.execute(String.format("/subsystem=datasources/data-source=%s:add(driver-name=h2, "
                     + "jndi-name=\"java:jboss/datasources/%s\", "
                     + "connection-url=\"jdbc:h2:mem:test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=REGULAR\", "
@@ -104,6 +106,7 @@ public class FailoverSecurityRealmTest extends AbstractAuthenticationSuite {
     static void removeSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try {
             if (realmRegistered) {
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", FAILOVER_REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
                     REALM_TYPE, REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
@@ -125,7 +128,11 @@ public class FailoverSecurityRealmTest extends AbstractAuthenticationSuite {
                 SaslAuthenticationMechanism.DIGEST_SHA,
                 SaslAuthenticationMechanism.DIGEST_SHA_256,
                 SaslAuthenticationMechanism.DIGEST_SHA_384,
-                SaslAuthenticationMechanism.DIGEST_SHA_512);
+                SaslAuthenticationMechanism.DIGEST_SHA_512,
+                SaslAuthenticationMechanism.SCRAM_SHA_1,
+                SaslAuthenticationMechanism.SCRAM_SHA_256,
+                SaslAuthenticationMechanism.SCRAM_SHA_384,
+                SaslAuthenticationMechanism.SCRAM_SHA_512);
     }
 
     static Set<HttpAuthenticationMechanism> realmHttpMechanisms() {

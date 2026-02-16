@@ -62,15 +62,20 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
                         dynamicTest(String.format("[%s] testSaslBruteForceDisabled(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceDisabled(mechanism)));
         }
-        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "testSaslBruteForceLockoutInterval")) {
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "BruteForceLockoutInterval")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceLockoutInterval(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceLockoutInterval(mechanism)));
         }
-        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "testSaslBruteForceSessionTimeout")) {
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "BruteForceSessionTimeout")) {
                 dynamicTests.add(
                         dynamicTest(String.format("[%s] testSaslBruteForceSessionTimeout(%s)", realmType, mechanism),
                                 () -> testSaslBruteForceSessionTimeout(mechanism)));
+        }
+        if (testFilter.shouldRunTest(TransportType.SASL, TestFamily.BRUTE_FORCE, "BruteForceMaxCachedSessions")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testSaslBruteForceMaxCachedSessions(%s)", realmType, mechanism),
+                                () -> testSaslBruteForceMaxCachedSessions(mechanism)));
         }
 
         if (dynamicTests.isEmpty()) {
@@ -95,14 +100,18 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), false);
 
-        //performSaslTest(mechanism.getMechanismName(), "user2", "password2", true);
         IdentityDefinition identityTwo = nextIdentity();
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), "passwordX", false);
         performSaslTest(mechanism.getMechanismName(), identityTwo.username(), identityTwo.password(), false);
+
+        // 3 various identites from 3 different realms of distributed-realm
+        IdentityDefinition identityThree = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityThree.username(), identityThree.password(), false);
     }
 
-    // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short lockout interval for tests (1 minute now).
     public void testSaslBruteForceLockoutInterval(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceLockoutInterval(%s)\n", mechanism);
 
@@ -113,7 +122,6 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
-    // TODO is it ok to test this just for one mech per realm? Also, it would be great if we could set short session timout for tests (1 minute now).
     public void testSaslBruteForceSessionTimeout(final SaslAuthenticationMechanism mechanism) throws Exception {
         System.out.printf("testSaslBruteForceSessionTimeout(%s)\n", mechanism);
 
@@ -121,6 +129,24 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
         Thread.sleep(121000);
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
+    }
+
+    public void testSaslBruteForceMaxCachedSessions(final SaslAuthenticationMechanism mechanism) throws Exception {
+        System.out.printf("testSaslBruteForceMaxCachedSessions(%s)\n", mechanism);
+
+        // lock an identity by exceeding the number of attempts
+        IdentityDefinition identityOne = nextIdentity();
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), false);
+
+        // add 3 more tracking sessions to remove the first session
+        performSaslTest(mechanism.getMechanismName(), nextIdentity().username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), nextIdentity().username(), "passwordX", false);
+        performSaslTest(mechanism.getMechanismName(), nextIdentity().username(), "passwordX", false);
+
+        // check the first identity is no longer locked
         performSaslTest(mechanism.getMechanismName(), identityOne.username(), identityOne.password(), true);
     }
 
@@ -157,6 +183,7 @@ public class BruteForceAuthnProtectionSaslSuiteRunner extends AbstractSaslSuiteR
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName), "2");
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName), "1");
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName), "2");
+                properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-cached-sessions", realmName), "3");
             }
             return properties;
         }
