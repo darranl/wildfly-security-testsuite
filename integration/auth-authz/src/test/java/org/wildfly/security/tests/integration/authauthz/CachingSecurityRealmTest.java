@@ -60,6 +60,8 @@ public class CachingSecurityRealmTest extends AbstractAuthenticationSuite {
 
     static void registerSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try {
+            // setup underlying realms differently so that we test that their configuration is not taken into account
+            managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:add(value=1)", WRAPPED_REALM_NAME)).assertSuccess();
             managementClient.execute(String.format("/subsystem=datasources/data-source=%s:add(driver-name=h2, "
                     + "jndi-name=\"java:jboss/datasources/%s\", connection-url=\"%s\", user-name=%s, password=%s, enabled=true)",
                     REALM_NAME, REALM_NAME, DB_URL, DB_USER, DB_PASSWORD)).assertSuccess();
@@ -96,6 +98,7 @@ public class CachingSecurityRealmTest extends AbstractAuthenticationSuite {
     static void removeSecurityRealm(OnlineManagementClient managementClient) throws IOException {
         try {
             if (realmRegistered) {
+                managementClient.execute(String.format("/system-property=wildfly.elytron.realm.%s.brute-force.max-failed-attempts:remove", WRAPPED_REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
                     REALM_TYPE, REALM_NAME)).assertSuccess();
                 managementClient.execute(String.format("/subsystem=elytron/%s=%s:remove",
