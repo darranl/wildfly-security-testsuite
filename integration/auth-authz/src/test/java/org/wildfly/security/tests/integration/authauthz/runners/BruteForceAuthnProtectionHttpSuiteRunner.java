@@ -79,6 +79,11 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
                         dynamicTest(String.format("[%s] testHttpBruteForceSessionTimeout(%s)", realmType, mechanism),
                                 () -> testHttpBruteForceSessionTimeout(mechanism)));
         }
+        if (testFilter.shouldRunTest(TransportType.HTTP, TestFamily.BRUTE_FORCE, "BruteForceMaxCachedSessions")) {
+                dynamicTests.add(
+                        dynamicTest(String.format("[%s] testHttpBruteForceMaxCachedSessions(%s)", realmType, mechanism),
+                                () -> testHttpBruteForceMaxCachedSessions(mechanism)));
+        }
 
         if (dynamicTests.isEmpty()) {
             System.out.println("No Tests Added - Adding a Dummy");
@@ -125,6 +130,19 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
         testClient.testHttpSuccess(mechanism, identityOne.username(), identityOne.password());
     }
 
+    public void testHttpBruteForceMaxCachedSessions(final HttpAuthenticationMechanism mechanism) throws Exception {
+        IdentityDefinition identityOne = nextIdentity();
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, identityOne.username(), identityOne.password());
+
+        testClient.testHttpBadPassword(mechanism, nextIdentity().username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, nextIdentity().username(), "passwordX");
+        testClient.testHttpBadPassword(mechanism, nextIdentity().username(), "passwordX");
+
+        testClient.testHttpSuccess(mechanism, identityOne.username(), identityOne.password());
+    }
+
     public void testHttpBruteForceDisabled(final HttpAuthenticationMechanism mechanism) throws Exception {
         try (OnlineManagementClient client = ManagementClient.online(OnlineOptions.standalone().localDefault().build())) {
             for (String realmName : delegateRealmNames()) {
@@ -156,6 +174,7 @@ public class BruteForceAuthnProtectionHttpSuiteRunner extends AbstractHttpSuiteR
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-failed-attempts", realmName), "2");
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.lockout-interval", realmName), "1");
                 properties.put(String.format("wildfly.elytron.realm.%s.brute-force.session-timeout", realmName), "2");
+                properties.put(String.format("wildfly.elytron.realm.%s.brute-force.max-cached-sessions", realmName), "3");
             }
             return properties;
         }
